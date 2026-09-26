@@ -1,0 +1,141 @@
+{
+  "model_name": "fraud_detection_xgboost",
+  "model_version": "V1",
+  "model_type": "XGBClassifier (binary:logistic)",
+  "trained_at_utc": "2026-09-25T18:52:33.828559+00:00",
+  "xgboost_version": "3.4.1",
+  "training_seconds": 68.9,
+  "best_iteration": 5,
+  "feature_count": 34,
+  "feature_names": [
+    "hour_of_day",
+    "amount",
+    "log_amount",
+    "is_large_amount",
+    "amount_to_sender_balance_ratio",
+    "amount_ge_sender_balance",
+    "sender_remaining_if_debited",
+    "amount_to_dest_balance_ratio",
+    "sender_balance_before",
+    "sender_balance_zero_before",
+    "dest_balance_before",
+    "dest_balance_zero_before",
+    "sender_prev_txn_count",
+    "sender_prev_total_amount",
+    "sender_prev_mean_amount",
+    "sender_prev_max_amount",
+    "dest_prev_txn_count",
+    "dest_prev_total_amount",
+    "dest_prev_mean_amount",
+    "dest_prev_max_amount",
+    "amount_vs_sender_hist_mean",
+    "amount_vs_dest_hist_mean",
+    "sender_hours_since_prev_txn",
+    "dest_hours_since_prev_txn",
+    "dest_txn_count_last_1h",
+    "dest_txn_count_last_24h",
+    "dest_txn_count_last_168h",
+    "dest_amount_sum_last_24h",
+    "dest_amount_sum_last_168h",
+    "type_CASH_IN",
+    "type_CASH_OUT",
+    "type_DEBIT",
+    "type_PAYMENT",
+    "type_TRANSFER"
+  ],
+  "feature_source": "cross-checked against ..\\reports\\selected_features.csv",
+  "target": "isFraud",
+  "train_validation_test_strategy": {
+    "method": "chronological (by step, no shuffling)",
+    "train_fraction_target": 0.7,
+    "validation_fraction_target": 0.15,
+    "test_fraction_target": 0.15,
+    "train_end_step": 323,
+    "validation_end_step": 378
+  },
+  "training_rows": 4463587,
+  "validation_rows": 980416,
+  "test_rows": 918617,
+  "class_ratio_training": {
+    "legitimate": 4459944,
+    "fraud": 3643,
+    "fraud_pct": 0.08161597387930379
+  },
+  "scale_pos_weight": 1224.250343123799,
+  "selected_classification_threshold": 0.6,
+  "threshold_selection_reason": "Threshold 0.60 maximises F1 = 0.9369 on the VALIDATION split (precision=0.8812, recall=1.0000), giving a documented, reproducible balance between false alarms and missed fraud. The TEST split was not used to choose it.",
+  "risk_level_definitions": {
+    "LOW": [
+      0,
+      30
+    ],
+    "MEDIUM": [
+      30,
+      70
+    ],
+    "HIGH": [
+      70,
+      100
+    ]
+  },
+  "evaluation_metrics": {
+    "train": {
+      "Split": "Training",
+      "Precision": 0.8837493881546745,
+      "Recall": 0.9912160307438924,
+      "F1": 0.9344028981757019,
+      "PR-AUC": 0.9779083143902169,
+      "ROC-AUC": 0.9996776761651968
+    },
+    "validation": {
+      "Split": "Validation",
+      "Precision": 0.88125,
+      "Recall": 1.0,
+      "F1": 0.9368770764119602,
+      "PR-AUC": 0.9817014622950372,
+      "ROC-AUC": 0.9999918373111957
+    },
+    "test": {
+      "Split": "Test",
+      "Precision": 0.9764590485532123,
+      "Recall": 0.9940089865202196,
+      "F1": 0.9851558634339436,
+      "PR-AUC": 0.9945875253387243,
+      "ROC-AUC": 0.9999523835278865
+    }
+  },
+  "confusion_matrix_test": {
+    "tp": 3982,
+    "tn": 914515,
+    "fp": 96,
+    "fn": 24
+  },
+  "brier_score_test": 0.13755000913727383,
+  "xgboost_parameters": {
+    "n_estimators": 300,
+    "max_depth": 5,
+    "learning_rate": 0.05,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "min_child_weight": 5,
+    "reg_lambda": 1.0,
+    "gamma": 0.0,
+    "scale_pos_weight": 1224.250343123799,
+    "objective": "binary:logistic",
+    "eval_metric": "aucpr",
+    "tree_method": "hist",
+    "random_state": 42,
+    "n_jobs": -1,
+    "early_stopping_rounds": 30
+  },
+  "dataset_info": {
+    "source_file": "..\\data\\processed\\featured_transactions.parquet",
+    "total_rows": 6362620,
+    "total_features_available": 34
+  },
+  "risk_score_definition": "risk_score = fraud_probability * 100 (model-derived, not independently calibrated)",
+  "notes": [
+    "Model V1 baseline. No SHAP, drift detection, or retraining implemented in this phase.",
+    "Threshold selected on validation data only; test data used exactly once for final evaluation."
+  ]
+}

@@ -1,0 +1,15 @@
+index,Value
+Unique senders,6353307.0
+senders with >1 transaction,9298.0
+% of senders with >1 transaction,0.1463489801453007
+Mean transactions per account,1.0014658507766112
+Median transactions per account,1.0
+Max transactions by one account,3.0
+Mean of per-account mean amount,179857.0856159636
+Median of per-account median amount,74973.81
+Max single-account max amount,92445516.64
+% of all transactions made by repeated accounts,0.2925052887018241
+senders involved in fraud,8213.0
+% of senders involved in fraud,0.12927125983365828
+senders with >=2 fraud transactions,0.0
+Max fraud transactions by one account,1.0

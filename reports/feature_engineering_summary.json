@@ -1,0 +1,311 @@
+{
+  "phase": "Phase 3 - Feature Engineering",
+  "input_file": "../data/raw/PS_20174392719_1491204439457_log.csv",
+  "rows": 6362620,
+  "output_file": "..\\data\\processed\\featured_transactions.parquet",
+  "output_format": "parquet",
+  "output_columns": {
+    "metadata": [
+      "event_id",
+      "step"
+    ],
+    "features": [
+      "hour_of_day",
+      "amount",
+      "log_amount",
+      "is_large_amount",
+      "amount_to_sender_balance_ratio",
+      "amount_ge_sender_balance",
+      "sender_remaining_if_debited",
+      "amount_to_dest_balance_ratio",
+      "sender_balance_before",
+      "sender_balance_zero_before",
+      "dest_balance_before",
+      "dest_balance_zero_before",
+      "sender_prev_txn_count",
+      "sender_prev_total_amount",
+      "sender_prev_mean_amount",
+      "sender_prev_max_amount",
+      "dest_prev_txn_count",
+      "dest_prev_total_amount",
+      "dest_prev_mean_amount",
+      "dest_prev_max_amount",
+      "amount_vs_sender_hist_mean",
+      "amount_vs_dest_hist_mean",
+      "sender_hours_since_prev_txn",
+      "dest_hours_since_prev_txn",
+      "dest_txn_count_last_1h",
+      "dest_txn_count_last_24h",
+      "dest_txn_count_last_168h",
+      "dest_amount_sum_last_24h",
+      "dest_amount_sum_last_168h",
+      "type_CASH_IN",
+      "type_CASH_OUT",
+      "type_DEBIT",
+      "type_PAYMENT",
+      "type_TRANSFER"
+    ],
+    "target": "isFraud"
+  },
+  "engineered_features_created": 58,
+  "selected_feature_count": 34,
+  "excluded_engineered_feature_count": 24,
+  "leakage_status_counts": {
+    "SAFE": 42,
+    "POTENTIAL_RISK": 9,
+    "UNSAFE": 7
+  },
+  "selected_features_by_group": {
+    "Account behaviour": 10,
+    "Amount": 7,
+    "Destination balance": 2,
+    "Sender balance": 2,
+    "Temporal": 1,
+    "Transaction type": 5,
+    "Velocity": 7
+  },
+  "excluded_features": {
+    "hour_sin": "EXCLUDE: redundant with hour_of_day for tree models (kept for linear models)",
+    "hour_cos": "EXCLUDE: redundant with hour_of_day for tree models (kept for linear models)",
+    "time_period_bin": "EXCLUDE: coarser duplicate of hour_of_day",
+    "day_index": "EXCLUDE: absolute time index encourages temporal over-fitting",
+    "is_zero_amount": "EXCLUDE: near-zero variance (100.000% one value); definition retained for real-data reuse",
+    "sender_balance_change": "EXCLUDE: UNSAFE - uses post-transaction information or the label",
+    "sender_balance_ratio": "EXCLUDE: UNSAFE - uses post-transaction information or the label",
+    "sender_balance_zero_after": "EXCLUDE: UNSAFE - uses post-transaction information or the label",
+    "sender_balance_consistency": "EXCLUDE: UNSAFE - uses post-transaction information or the label",
+    "dest_balance_change": "EXCLUDE: UNSAFE - uses post-transaction information or the label",
+    "dest_balance_zero_after": "EXCLUDE: UNSAFE - uses post-transaction information or the label",
+    "dest_balance_consistency": "EXCLUDE: UNSAFE - uses post-transaction information or the label",
+    "sender_prev_unique_counterparties": "EXCLUDE: exact duplicate of sender_prev_txn_count",
+    "dest_prev_unique_counterparties": "EXCLUDE: exact duplicate of dest_prev_txn_count",
+    "is_new_destination_for_sender": "EXCLUDE: constant in the training period",
+    "sender_txn_count_last_1h": "EXCLUDE: near-zero variance (99.999% one value); definition retained for real-data reuse",
+    "sender_txn_count_last_24h": "EXCLUDE: near-zero variance (99.982% one value); definition retained for real-data reuse",
+    "sender_txn_count_last_168h": "EXCLUDE: near-zero variance (99.922% one value); definition retained for real-data reuse",
+    "sender_amount_sum_last_24h": "EXCLUDE: near-zero variance (99.982% one value); definition retained for real-data reuse",
+    "sender_amount_sum_last_168h": "EXCLUDE: near-zero variance (99.922% one value); definition retained for real-data reuse",
+    "sender_new_counterparties_last_24h": "EXCLUDE: near-zero variance (99.982% one value); definition retained for real-data reuse",
+    "sender_new_counterparties_last_168h": "EXCLUDE: near-zero variance (99.922% one value); definition retained for real-data reuse",
+    "dest_new_counterparties_last_24h": "EXCLUDE: exact duplicate of dest_txn_count_last_24h",
+    "dest_new_counterparties_last_168h": "EXCLUDE: exact duplicate of dest_txn_count_last_168h",
+    "isFraud": "Label - kept separately as the target, never an input feature",
+    "isFlaggedFraud": "Exclude | Prediction-time availability: the moment the rule sets the flag (before or after the score) is not documented -> cannot be guaranteed. Usefulness/variance: only 16 rows (0.00025%) are flagged -> near-zero variance.",
+    "nameOrig": "High-cardinality identifier; used only as a key for history features",
+    "nameDest": "High-cardinality identifier; used only as a key for history features",
+    "oldbalanceOrg / oldbalanceDest": "Represented by sender_balance_before / dest_balance_before",
+    "newbalanceOrig / newbalanceDest": "Post-transaction information"
+  },
+  "class_balance_unchanged": {
+    "legitimate_count": 6354407,
+    "fraud_count": 8213,
+    "fraud_percentage": 0.12908204481801522,
+    "imbalance_ratio": 773.7010836478753
+  },
+  "frozen_parameters_fitted_on_training_period": {
+    "large_amount_threshold": 1452542.9963999956,
+    "type_categories": [
+      "CASH_IN",
+      "CASH_OUT",
+      "DEBIT",
+      "PAYMENT",
+      "TRANSFER"
+    ],
+    "tolerance": 0.01,
+    "windows": [
+      1,
+      24,
+      168
+    ],
+    "sum_windows": [
+      24,
+      168
+    ],
+    "newcp_windows": [
+      24,
+      168
+    ],
+    "hours_per_day": 24,
+    "retain_flag_feature": false,
+    "train_end_step": 323,
+    "train_fraction": 0.7
+  },
+  "event_order": "stable order by (step, original row position); history features use strictly earlier events only",
+  "isFlaggedFraud_decision": {
+    "retain": false,
+    "action": "Exclude",
+    "reasons": [
+      "Prediction-time availability: the moment the rule sets the flag (before or after the score) is not documented -> cannot be guaranteed.",
+      "Usefulness/variance: only 16 rows (0.00025%) are flagged -> near-zero variance.",
+      "Usefulness: the flag covers only 0.1948% of all fraud.",
+      "Redundancy: flagged rows are a tiny subset of otherwise similar transactions -> the flag adds little beyond type and amount.",
+      "Leakage risk: a model given the rule's output may simply reproduce the rule instead of learning fraud patterns."
+    ],
+    "evidence": {
+      "rows": 6362620,
+      "flagged_rows": 16,
+      "flagged_pct_of_rows": 0.00025146873457789404,
+      "flagged_and_fraud": 16,
+      "fraud_not_flagged": 8197,
+      "flagged_not_fraud": 0,
+      "fraud_coverage_pct": 0.19481310118105444,
+      "flagged_types": {
+        "TRANSFER": 16
+      },
+      "min_flagged_amount": 353874.22,
+      "share_of_similar_rows_flagged_pct": 0.0049209722610944855
+    }
+  },
+  "near_zero_variance_features": [
+    "is_zero_amount",
+    "sender_txn_count_last_1h",
+    "sender_txn_count_last_24h",
+    "sender_txn_count_last_168h",
+    "sender_amount_sum_last_24h",
+    "sender_amount_sum_last_168h",
+    "sender_new_counterparties_last_24h",
+    "sender_new_counterparties_last_168h"
+  ],
+  "constant_features": [
+    "is_new_destination_for_sender"
+  ],
+  "duplicate_features": {
+    "sender_prev_unique_counterparties": "sender_prev_txn_count",
+    "dest_prev_unique_counterparties": "dest_prev_txn_count",
+    "sender_new_counterparties_last_24h": "sender_txn_count_last_24h",
+    "sender_new_counterparties_last_168h": "sender_txn_count_last_168h",
+    "dest_new_counterparties_last_24h": "dest_txn_count_last_24h",
+    "dest_new_counterparties_last_168h": "dest_txn_count_last_168h"
+  },
+  "identifier_like_features": [],
+  "high_correlation_pairs_reported_not_deleted": [
+    {
+      "feature_a": "sender_prev_txn_count",
+      "feature_b": "sender_prev_unique_counterparties",
+      "pearson_r": 1.0
+    },
+    {
+      "feature_a": "sender_prev_total_amount",
+      "feature_b": "sender_prev_mean_amount",
+      "pearson_r": 1.0
+    },
+    {
+      "feature_a": "sender_prev_total_amount",
+      "feature_b": "sender_prev_max_amount",
+      "pearson_r": 1.0000000000000004
+    },
+    {
+      "feature_a": "sender_prev_mean_amount",
+      "feature_b": "sender_prev_max_amount",
+      "pearson_r": 1.0000000000000004
+    },
+    {
+      "feature_a": "dest_prev_txn_count",
+      "feature_b": "dest_prev_unique_counterparties",
+      "pearson_r": 1.0
+    },
+    {
+      "feature_a": "sender_txn_count_last_24h",
+      "feature_b": "sender_new_counterparties_last_24h",
+      "pearson_r": 1.0
+    },
+    {
+      "feature_a": "sender_txn_count_last_168h",
+      "feature_b": "sender_new_counterparties_last_168h",
+      "pearson_r": 1.0
+    },
+    {
+      "feature_a": "dest_txn_count_last_24h",
+      "feature_b": "dest_new_counterparties_last_24h",
+      "pearson_r": 1.0
+    },
+    {
+      "feature_a": "dest_txn_count_last_168h",
+      "feature_b": "dest_new_counterparties_last_168h",
+      "pearson_r": 1.0
+    }
+  ],
+  "nan_by_design_features": [
+    "amount_to_sender_balance_ratio",
+    "amount_to_dest_balance_ratio",
+    "sender_balance_ratio",
+    "sender_prev_mean_amount",
+    "sender_prev_max_amount",
+    "dest_prev_mean_amount",
+    "dest_prev_max_amount",
+    "amount_vs_sender_hist_mean",
+    "amount_vs_dest_hist_mean",
+    "sender_hours_since_prev_txn",
+    "dest_hours_since_prev_txn"
+  ],
+  "consistency_tests": {
+    "row_level_test_passed": true,
+    "prefix_invariance_test_passed": true,
+    "prefix_test_rows": 300000,
+    "streaming_reference_test_passed": true,
+    "streaming_test_events": 50000,
+    "streaming_features_compared": 29
+  },
+  "validation": {
+    "row count preserved": {
+      "passed": true,
+      "detail": "6,362,620 rows"
+    },
+    "column count": {
+      "passed": true,
+      "detail": "34 feature columns"
+    },
+    "target present separately and not in features": {
+      "passed": true,
+      "detail": ""
+    },
+    "target distribution unchanged (no resampling)": {
+      "passed": true,
+      "detail": "{'legitimate': 6354407, 'fraud': 8213}"
+    },
+    "missing values only where undefined by design": {
+      "passed": true,
+      "detail": "10 features contain NaN"
+    },
+    "no infinite values": {
+      "passed": true,
+      "detail": "0 infinite values"
+    },
+    "duplicate_feature_rows_info": 8182,
+    "feature names valid and unique": {
+      "passed": true,
+      "detail": ""
+    },
+    "all feature dtypes numeric": {
+      "passed": true,
+      "detail": "['float32', 'float64', 'int32', 'int8']"
+    },
+    "no UNSAFE feature selected": {
+      "passed": true,
+      "detail": ""
+    },
+    "all selected features available at prediction time": {
+      "passed": true,
+      "detail": ""
+    },
+    "chronological order preserved": {
+      "passed": true,
+      "detail": ""
+    },
+    "no-future-information tests passed": {
+      "passed": true,
+      "detail": ""
+    }
+  },
+  "figures": [
+    "p3_01_temporal_features.png",
+    "p3_02_amount_features.png",
+    "p3_03_balance_features.png",
+    "p3_04_velocity_features.png",
+    "p3_05_outlier_review.png",
+    "p3_06_selected_feature_correlation.png",
+    "p3_07_selected_binary_features_by_class.png"
+  ],
+  "runtime_seconds": 345.4,
+  "no_model_trained": true
+}

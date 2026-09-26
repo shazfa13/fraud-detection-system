@@ -1,0 +1,15 @@
+index,Value
+Unique destinations,2722362.0
+destinations with >1 transaction,459658.0
+% of destinations with >1 transaction,16.884528949493124
+Mean transactions per account,2.337168973119666
+Median transactions per account,1.0
+Max transactions by one account,113.0
+Mean of per-account mean amount,59621.855236478106
+Median of per-account median amount,12965.875
+Max single-account max amount,92445516.64
+% of all transactions made by repeated accounts,64.43754302472881
+destinations involved in fraud,8169.0
+% of destinations involved in fraud,0.30007030659405326
+destinations with >=2 fraud transactions,44.0
+Max fraud transactions by one account,2.0

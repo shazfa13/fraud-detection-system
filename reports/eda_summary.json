@@ -1,0 +1,282 @@
+{
+  "dataset_shape": {
+    "rows": 6362620,
+    "columns": 11
+  },
+  "memory_usage_mb": 509.4834222793579,
+  "source_file": "data\\raw\\PS_20174392719_1491204439457_log.csv",
+  "fraud_count": 8213,
+  "legitimate_count": 6354407,
+  "fraud_percentage": 0.12908204481801522,
+  "imbalance_ratio": 773.7010836478753,
+  "missing_columns": [],
+  "extra_columns": [],
+  "missing_value_cells": 0,
+  "duplicate_count": 0,
+  "invalid_value_checks_failed": [],
+  "numeric_columns": [
+    "step",
+    "amount",
+    "oldbalanceOrg",
+    "newbalanceOrig",
+    "oldbalanceDest",
+    "newbalanceDest",
+    "isFraud",
+    "isFlaggedFraud"
+  ],
+  "categorical_columns": [
+    "type",
+    "nameOrig",
+    "nameDest"
+  ],
+  "high_cardinality_columns": [
+    "nameOrig",
+    "nameDest"
+  ],
+  "identifier_columns": [
+    "nameOrig"
+  ],
+  "potential_leakage_columns": [
+    "newbalanceOrig",
+    "newbalanceDest",
+    "isFraud"
+  ],
+  "leakage_needs_investigation_columns": [
+    "oldbalanceOrg",
+    "oldbalanceDest",
+    "isFlaggedFraud"
+  ],
+  "prediction_time_risk_columns": [
+    "newbalanceOrig",
+    "newbalanceDest",
+    "isFraud",
+    "isFlaggedFraud"
+  ],
+  "feature_candidates": [
+    "log_amount",
+    "transaction_type (one-hot / categorical)",
+    "amount_ratio = amount / oldbalanceOrg",
+    "transaction_hour_of_day (cyclic encoding)",
+    "transaction_day",
+    "sender_frequency / transactions_last_1h / transactions_last_24h",
+    "average_customer_amount and amount_deviation",
+    "time_since_previous_transaction",
+    "recipient_frequency",
+    "new_recipient (first time sender -> recipient)",
+    "recipient_account_category (name prefix)",
+    "recipient_old_balance_is_zero",
+    "sender_balance_error = oldbalanceOrg - amount - newbalanceOrig",
+    "recipient_balance_error = oldbalanceDest + amount - newbalanceDest",
+    "isFlaggedFraud (as input)"
+  ],
+  "dataset_limitations": [
+    "PaySim is synthetic: transactions and fraud were produced by a simulator, so patterns may reflect the simulator's rules rather than real customer behaviour.",
+    "Fraud labels are simulated; they do not include real investigation outcomes, label noise, or disputed cases.",
+    "Results (model performance, drift behaviour) will not automatically generalise to real banking data; the project demonstrates architecture and methodology.",
+    "The simulation has no real-world context: no device, location, merchant category, customer profile, channel or session data.",
+    "Account identifiers are anonymised strings; their structure (e.g. name prefix) is not documented in the file itself.",
+    "Balance fields may follow simulator-specific rules (e.g. zero balances, inconsistent updates); they must not be assumed to behave like real ledger data.",
+    "Time is a simulated hourly step over a short horizon; there are no real calendar effects (weekends, holidays, seasons).",
+    "There is no transaction ID; the streaming simulation needs to create event identifiers.",
+    "Delayed labels do not exist in the file; label delay has to be simulated.",
+    "Measured: only 0.146% of senders make more than one transaction, so per-customer behavioural history is limited in this file.",
+    "Measured: 16.885% of destinations receive more than one transaction.",
+    "Measured: no fraud appears in transaction types ['PAYMENT', 'CASH_IN', 'DEBIT']; fraud is confined to ['CASH_OUT', 'TRANSFER']."
+  ],
+  "transaction_types": [
+    {
+      "Transaction Type": "CASH_OUT",
+      "Total Transactions": 2237500,
+      "Fraud Transactions": 4116,
+      "Legitimate Transactions": 2233384,
+      "Fraud Rate (%)": 0.1839553073,
+      "Share of All Transactions (%)": 35.1663308511,
+      "Share of All Fraud (%)": 50.1156702788
+    },
+    {
+      "Transaction Type": "PAYMENT",
+      "Total Transactions": 2151495,
+      "Fraud Transactions": 0,
+      "Legitimate Transactions": 2151495,
+      "Fraud Rate (%)": 0.0,
+      "Share of All Transactions (%)": 33.8146078188,
+      "Share of All Fraud (%)": 0.0
+    },
+    {
+      "Transaction Type": "CASH_IN",
+      "Total Transactions": 1399284,
+      "Fraud Transactions": 0,
+      "Legitimate Transactions": 1399284,
+      "Fraud Rate (%)": 0.0,
+      "Share of All Transactions (%)": 21.9922610497,
+      "Share of All Fraud (%)": 0.0
+    },
+    {
+      "Transaction Type": "TRANSFER",
+      "Total Transactions": 532909,
+      "Fraud Transactions": 4097,
+      "Legitimate Transactions": 528812,
+      "Fraud Rate (%)": 0.7687991758,
+      "Share of All Transactions (%)": 8.3756219922,
+      "Share of All Fraud (%)": 49.8843297212
+    },
+    {
+      "Transaction Type": "DEBIT",
+      "Total Transactions": 41432,
+      "Fraud Transactions": 0,
+      "Legitimate Transactions": 41432,
+      "Fraud Rate (%)": 0.0,
+      "Share of All Transactions (%)": 0.6511782882,
+      "Share of All Fraud (%)": 0.0
+    }
+  ],
+  "amount_statistics": {
+    "count": 6362620,
+    "mean": 179861.90354913071,
+    "median": 74871.94,
+    "std": 603858.2314629931,
+    "min": 0.0,
+    "Q1 (25%)": 13389.57,
+    "Q3 (75%)": 208721.4775,
+    "max": 92445516.64,
+    "IQR": 195331.9075,
+    "skewness": 30.99394948249038
+  },
+  "time_range": {
+    "min_step": 1,
+    "max_step": 743,
+    "unique_steps": 743,
+    "sorted_by_step": true
+  },
+  "temporal_split_plan": {
+    "train_end_step": 323,
+    "validation_end_step": 378,
+    "periods": [
+      {
+        "Period": "Train (earliest)",
+        "Total Transactions": 4463587,
+        "Fraud Transactions": 3643,
+        "First step": 1,
+        "Last step": 323,
+        "Share of all transactions (%)": 70.1532859105,
+        "Fraud Rate (%)": 0.0816159739,
+        "Share of all fraud (%)": 44.3565079752
+      },
+      {
+        "Period": "Validation",
+        "Total Transactions": 980416,
+        "Fraud Transactions": 564,
+        "First step": 324,
+        "Last step": 378,
+        "Share of all transactions (%)": 15.40899818,
+        "Fraud Rate (%)": 0.057526601,
+        "Share of all fraud (%)": 6.8671618166
+      },
+      {
+        "Period": "Test (latest)",
+        "Total Transactions": 918617,
+        "Fraud Transactions": 4006,
+        "First step": 379,
+        "Last step": 743,
+        "Share of all transactions (%)": 14.4377159095,
+        "Fraud Rate (%)": 0.4360903402,
+        "Share of all fraud (%)": 48.7763302082
+      }
+    ]
+  },
+  "isFlaggedFraud": {
+    "flagged": 16,
+    "fraud_covered": 16,
+    "fraud_coverage_pct": 0.19481310118105444,
+    "modeling_status": "Requires modeling decision after further investigation"
+  },
+  "sender_summary": {
+    "Unique senders": 6353307,
+    "senders with >1 transaction": 9298,
+    "% of senders with >1 transaction": 0.1463489801453007,
+    "Mean transactions per account": 1.0014658507766112,
+    "Median transactions per account": 1.0,
+    "Max transactions by one account": 3,
+    "Mean of per-account mean amount": 179857.0856159636,
+    "Median of per-account median amount": 74973.81,
+    "Max single-account max amount": 92445516.64,
+    "% of all transactions made by repeated accounts": 0.2925052887018241,
+    "senders involved in fraud": 8213,
+    "% of senders involved in fraud": 0.12927125983365828,
+    "senders with >=2 fraud transactions": 0,
+    "Max fraud transactions by one account": 1
+  },
+  "destination_summary": {
+    "Unique destinations": 2722362,
+    "destinations with >1 transaction": 459658,
+    "% of destinations with >1 transaction": 16.884528949493124,
+    "Mean transactions per account": 2.337168973119666,
+    "Median transactions per account": 1.0,
+    "Max transactions by one account": 113,
+    "Mean of per-account mean amount": 59621.855236478106,
+    "Median of per-account median amount": 12965.875,
+    "Max single-account max amount": 92445516.64,
+    "% of all transactions made by repeated accounts": 64.43754302472881,
+    "destinations involved in fraud": 8169,
+    "% of destinations involved in fraud": 0.30007030659405326,
+    "destinations with >=2 fraud transactions": 44,
+    "Max fraud transactions by one account": 2
+  },
+  "tables_exported": [
+    "dataset_summary.csv",
+    "data_types.csv",
+    "numeric_summary.csv",
+    "missing_values.csv",
+    "duplicate_summary.csv",
+    "data_quality_audit.csv",
+    "fraud_distribution.csv",
+    "transaction_type_analysis.csv",
+    "amount_summary.csv",
+    "temporal_analysis.csv",
+    "temporal_analysis_by_day.csv",
+    "temporal_analysis_by_hour.csv",
+    "transaction_type_by_day.csv",
+    "sender_analysis.csv",
+    "destination_analysis.csv",
+    "account_prefix_analysis.csv",
+    "account_concentration.csv",
+    "balance_analysis.csv",
+    "balance_change_orig.csv",
+    "balance_change_dest.csv",
+    "balance_consistency_overall.csv",
+    "balance_consistency_by_type.csv",
+    "balance_consistency_by_class.csv",
+    "isflaggedfraud_analysis.csv",
+    "numeric_feature_analysis.csv",
+    "correlation_matrix.csv",
+    "outlier_summary.csv",
+    "fraud_vs_legitimate_comparison.csv",
+    "cardinality_analysis.csv",
+    "leakage_audit.csv",
+    "leakage_probes.csv",
+    "prediction_time_availability.csv",
+    "temporal_split_plan.csv",
+    "feature_candidates.csv",
+    "streaming_replay_plan.csv",
+    "drift_reference_vs_recent.csv"
+  ],
+  "tables_not_created": [],
+  "figures_exported": [
+    "01_fraud_distribution.png",
+    "02_transaction_type_distribution.png",
+    "03_fraud_rate_by_type.png",
+    "04_amount_distribution.png",
+    "05_amount_fraud_comparison.png",
+    "06_transaction_volume_over_time.png",
+    "07_fraud_volume_over_time.png",
+    "08_fraud_rate_over_time.png",
+    "09_type_time_heatmap.png",
+    "10_balance_distribution.png",
+    "11_correlation_heatmap.png",
+    "12_outlier_analysis.png",
+    "13_temporal_fraud_patterns.png",
+    "14_sender_behavior.png",
+    "15_destination_behavior.png",
+    "16_numeric_feature_distributions.png"
+  ]
+}

@@ -1,0 +1,4 @@
+Column,Prefix,Transactions,Share (%),Fraud Transactions,Fraud Rate (%)
+nameOrig,C,6362620,100.0,8213,0.12908204481801522
+nameDest,C,4211125,66.18539218120837,8213,0.1950310190269821
+nameDest,M,2151495,33.81460781879163,0,0.0

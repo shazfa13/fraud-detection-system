@@ -1,0 +1,4 @@
+column,unique_values,cardinality_ratio,level,identifier_like,recommended_handling
+type,5,7.858397955559188e-07,Low Cardinality,False,Suitable for one-hot / native categorical encoding
+nameOrig,6353307,0.9985362947967975,High Cardinality,True,Identifier: do NOT encode directly; derive behavioural (aggregate) features from past transactions or drop
+nameDest,2722362,0.4278680795018404,High Cardinality,False,Do not one-hot; consider frequency/behavioural aggregation

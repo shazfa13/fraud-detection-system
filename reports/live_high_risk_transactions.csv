@@ -1,0 +1,1 @@
+simulation_id,step,transaction_type,amount,fraud_probability,risk_score,risk_level,predicted_label,actual_label

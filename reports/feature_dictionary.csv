@@ -1,0 +1,59 @@
+Feature,Group,Description,Formula,Data Type,Prediction-Time Available,Leakage Risk,Final Action
+hour_of_day,Temporal,"Simulated hour within a 24-step cycle (0-23), relative to simulation start.",(step-1) % 24,int8,Yes,SAFE,KEEP
+hour_sin,Temporal,Cyclic sine encoding of hour_of_day.,sin(2*pi*hour/24),float32,Yes,SAFE,EXCLUDE: redundant with hour_of_day for tree models (kept for linear models)
+hour_cos,Temporal,Cyclic cosine encoding of hour_of_day.,cos(2*pi*hour/24),float32,Yes,SAFE,EXCLUDE: redundant with hour_of_day for tree models (kept for linear models)
+time_period_bin,Temporal,"Coarse period of the 24-step cycle: 0=hours 0-5, 1=6-11, 2=12-17, 3=18-23 (relative, not clock time).",hour_of_day // 6,int8,Yes,SAFE,EXCLUDE: coarser duplicate of hour_of_day
+day_index,Temporal,Simulated day number since simulation start (0-based).,(step-1) // 24,int16,Yes,POTENTIAL_RISK,EXCLUDE: absolute time index encourages temporal over-fitting
+amount,Amount,Transaction amount.,amount,float64,Yes,SAFE,KEEP
+log_amount,Amount,log(1 + amount); compresses the heavy right tail.,log1p(amount),float32,Yes,SAFE,KEEP
+is_zero_amount,Amount,1 if amount == 0.,amount == 0,int8,Yes,SAFE,EXCLUDE: near-zero variance (100.000% one value); definition retained for real-data reuse
+is_large_amount,Amount,1 if amount >= the training-period 99th percentile (constant fitted on training period only).,amount >= P99(train),int8,Yes,SAFE,KEEP
+amount_to_sender_balance_ratio,Amount,Amount divided by the sender's balance BEFORE the transaction (NaN if that balance is 0).,amount / oldbalanceOrg,float32,Yes (confirm snapshot timing),POTENTIAL_RISK,KEEP (POTENTIAL_RISK: verify in Phase 4 ablation)
+amount_ge_sender_balance,Amount,1 if the amount is >= the sender's pre-transaction balance (and the balance is > 0): the whole balance is requested.,(amount >= oldbalanceOrg - tol) & (oldbalanceOrg > 0),int8,Yes (confirm snapshot timing),POTENTIAL_RISK,KEEP (POTENTIAL_RISK: verify in Phase 4 ablation)
+sender_remaining_if_debited,Amount,"Balance the sender WOULD have if the amount were debited (expected, not observed).",oldbalanceOrg - amount,float32,Yes (confirm snapshot timing),POTENTIAL_RISK,KEEP (POTENTIAL_RISK: verify in Phase 4 ablation)
+amount_to_dest_balance_ratio,Amount,Amount divided by the destination's balance BEFORE the transaction (NaN if that balance is 0).,amount / oldbalanceDest,float32,Yes (confirm snapshot timing),POTENTIAL_RISK,KEEP (POTENTIAL_RISK: verify in Phase 4 ablation)
+sender_balance_before,Sender balance,Sender balance before the transaction.,oldbalanceOrg,float32,Yes (confirm snapshot timing),POTENTIAL_RISK,KEEP (POTENTIAL_RISK: verify in Phase 4 ablation)
+sender_balance_zero_before,Sender balance,1 if the sender's balance before the transaction is 0.,oldbalanceOrg == 0,int8,Yes (confirm snapshot timing),POTENTIAL_RISK,KEEP (POTENTIAL_RISK: verify in Phase 4 ablation)
+sender_balance_change,Sender balance,Observed change in sender balance.,newbalanceOrig - oldbalanceOrg,float32,No,UNSAFE,EXCLUDE: UNSAFE - uses post-transaction information or the label
+sender_balance_ratio,Sender balance,Sender balance after / before.,newbalanceOrig / oldbalanceOrg,float32,No,UNSAFE,EXCLUDE: UNSAFE - uses post-transaction information or the label
+sender_balance_zero_after,Sender balance,1 if the sender's balance after the transaction is 0.,newbalanceOrig == 0,int8,No,UNSAFE,EXCLUDE: UNSAFE - uses post-transaction information or the label
+sender_balance_consistency,Sender balance,Accounting error on the sender side.,oldbalanceOrg - amount - newbalanceOrig,float32,No,UNSAFE,EXCLUDE: UNSAFE - uses post-transaction information or the label
+dest_balance_before,Destination balance,Recipient balance before the transaction.,oldbalanceDest,float32,Yes (confirm snapshot timing),POTENTIAL_RISK,KEEP (POTENTIAL_RISK: verify in Phase 4 ablation)
+dest_balance_zero_before,Destination balance,1 if the recipient's balance before the transaction is 0.,oldbalanceDest == 0,int8,Yes (confirm snapshot timing),POTENTIAL_RISK,KEEP (POTENTIAL_RISK: verify in Phase 4 ablation)
+dest_balance_change,Destination balance,Observed change in recipient balance.,newbalanceDest - oldbalanceDest,float32,No,UNSAFE,EXCLUDE: UNSAFE - uses post-transaction information or the label
+dest_balance_zero_after,Destination balance,1 if the recipient's balance after the transaction is 0.,newbalanceDest == 0,int8,No,UNSAFE,EXCLUDE: UNSAFE - uses post-transaction information or the label
+dest_balance_consistency,Destination balance,Accounting error on the recipient side.,oldbalanceDest + amount - newbalanceDest,float32,No,UNSAFE,EXCLUDE: UNSAFE - uses post-transaction information or the label
+sender_prev_txn_count,Account behaviour,Number of earlier transactions of this sender account.,count of earlier events,int32,Yes (needs streaming state),SAFE,KEEP
+sender_prev_total_amount,Account behaviour,Total amount of earlier transactions of this sender account.,sum of earlier amounts,float32,Yes (needs streaming state),SAFE,KEEP
+sender_prev_mean_amount,Account behaviour,Mean amount of earlier transactions of this sender account (NaN if none).,mean of earlier amounts,float32,Yes (needs streaming state),SAFE,KEEP
+sender_prev_max_amount,Account behaviour,Largest earlier amount of this sender account (NaN if none).,max of earlier amounts,float32,Yes (needs streaming state),SAFE,KEEP
+sender_prev_unique_counterparties,Account behaviour,Distinct destinations this sender account has already transacted with.,count of first-ever pairs so far,int32,Yes (needs streaming state),SAFE,EXCLUDE: exact duplicate of sender_prev_txn_count
+sender_hours_since_prev_txn,Velocity,Steps (hours) since the previous transaction of this sender account (NaN if none).,step - previous step,float32,Yes (needs streaming state),SAFE,KEEP
+sender_txn_count_last_1h,Velocity,Earlier transactions of this sender account within the last 1 step(s) (same step only).,count of earlier events with step > step-1,int32,Yes (needs streaming state),SAFE,EXCLUDE: near-zero variance (99.999% one value); definition retained for real-data reuse
+sender_txn_count_last_24h,Velocity,Earlier transactions of this sender account within the last 24 step(s).,count of earlier events with step > step-24,int32,Yes (needs streaming state),SAFE,EXCLUDE: near-zero variance (99.982% one value); definition retained for real-data reuse
+sender_txn_count_last_168h,Velocity,Earlier transactions of this sender account within the last 168 step(s).,count of earlier events with step > step-168,int32,Yes (needs streaming state),SAFE,EXCLUDE: near-zero variance (99.922% one value); definition retained for real-data reuse
+sender_amount_sum_last_24h,Velocity,Total amount of earlier transactions of this sender account within the last 24 steps.,sum of earlier amounts with step > step-24,float32,Yes (needs streaming state),SAFE,EXCLUDE: near-zero variance (99.982% one value); definition retained for real-data reuse
+sender_amount_sum_last_168h,Velocity,Total amount of earlier transactions of this sender account within the last 168 steps.,sum of earlier amounts with step > step-168,float32,Yes (needs streaming state),SAFE,EXCLUDE: near-zero variance (99.922% one value); definition retained for real-data reuse
+sender_new_counterparties_last_24h,Velocity,Earlier transactions in the last 24 steps in which this sender account met a destination for the FIRST EVER time.,count of earlier first-ever pairs in window,int32,Yes (needs streaming state),SAFE,EXCLUDE: near-zero variance (99.982% one value); definition retained for real-data reuse
+sender_new_counterparties_last_168h,Velocity,Earlier transactions in the last 168 steps in which this sender account met a destination for the FIRST EVER time.,count of earlier first-ever pairs in window,int32,Yes (needs streaming state),SAFE,EXCLUDE: near-zero variance (99.922% one value); definition retained for real-data reuse
+dest_prev_txn_count,Account behaviour,Number of earlier transactions of this destination account.,count of earlier events,int32,Yes (needs streaming state),SAFE,KEEP
+dest_prev_total_amount,Account behaviour,Total amount of earlier transactions of this destination account.,sum of earlier amounts,float32,Yes (needs streaming state),SAFE,KEEP
+dest_prev_mean_amount,Account behaviour,Mean amount of earlier transactions of this destination account (NaN if none).,mean of earlier amounts,float32,Yes (needs streaming state),SAFE,KEEP
+dest_prev_max_amount,Account behaviour,Largest earlier amount of this destination account (NaN if none).,max of earlier amounts,float32,Yes (needs streaming state),SAFE,KEEP
+dest_prev_unique_counterparties,Account behaviour,Distinct senders this destination account has already transacted with.,count of first-ever pairs so far,int32,Yes (needs streaming state),SAFE,EXCLUDE: exact duplicate of dest_prev_txn_count
+dest_hours_since_prev_txn,Velocity,Steps (hours) since the previous transaction of this destination account (NaN if none).,step - previous step,float32,Yes (needs streaming state),SAFE,KEEP
+dest_txn_count_last_1h,Velocity,Earlier transactions of this destination account within the last 1 step(s) (same step only).,count of earlier events with step > step-1,int32,Yes (needs streaming state),SAFE,KEEP
+dest_txn_count_last_24h,Velocity,Earlier transactions of this destination account within the last 24 step(s).,count of earlier events with step > step-24,int32,Yes (needs streaming state),SAFE,KEEP
+dest_txn_count_last_168h,Velocity,Earlier transactions of this destination account within the last 168 step(s).,count of earlier events with step > step-168,int32,Yes (needs streaming state),SAFE,KEEP
+dest_amount_sum_last_24h,Velocity,Total amount of earlier transactions of this destination account within the last 24 steps.,sum of earlier amounts with step > step-24,float32,Yes (needs streaming state),SAFE,KEEP
+dest_amount_sum_last_168h,Velocity,Total amount of earlier transactions of this destination account within the last 168 steps.,sum of earlier amounts with step > step-168,float32,Yes (needs streaming state),SAFE,KEEP
+dest_new_counterparties_last_24h,Velocity,Earlier transactions in the last 24 steps in which this destination account met a sender for the FIRST EVER time.,count of earlier first-ever pairs in window,int32,Yes (needs streaming state),SAFE,EXCLUDE: exact duplicate of dest_txn_count_last_24h
+dest_new_counterparties_last_168h,Velocity,Earlier transactions in the last 168 steps in which this destination account met a sender for the FIRST EVER time.,count of earlier first-ever pairs in window,int32,Yes (needs streaming state),SAFE,EXCLUDE: exact duplicate of dest_txn_count_last_168h
+is_new_destination_for_sender,Account behaviour,1 if this sender has never paid this destination before (first-ever sender->destination pair).,pair not seen in earlier events,int8,Yes (needs streaming state),SAFE,EXCLUDE: constant in the training period
+amount_vs_sender_hist_mean,Account behaviour,Amount divided by the sender's earlier mean amount (NaN if no history).,amount / sender_prev_mean_amount,float32,Yes (needs streaming state),SAFE,KEEP
+amount_vs_dest_hist_mean,Account behaviour,Amount divided by the destination's earlier mean received amount (NaN if no history).,amount / dest_prev_mean_amount,float32,Yes (needs streaming state),SAFE,KEEP
+type_PAYMENT,Transaction type,One-hot indicator: type == PAYMENT.,type == 'PAYMENT',int8,Yes,SAFE,KEEP
+type_TRANSFER,Transaction type,One-hot indicator: type == TRANSFER.,type == 'TRANSFER',int8,Yes,SAFE,KEEP
+type_CASH_OUT,Transaction type,One-hot indicator: type == CASH_OUT.,type == 'CASH_OUT',int8,Yes,SAFE,KEEP
+type_DEBIT,Transaction type,One-hot indicator: type == DEBIT.,type == 'DEBIT',int8,Yes,SAFE,KEEP
+type_CASH_IN,Transaction type,One-hot indicator: type == CASH_IN.,type == 'CASH_IN',int8,Yes,SAFE,KEEP

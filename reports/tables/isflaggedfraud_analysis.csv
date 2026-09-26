@@ -1,0 +1,5 @@
+Flagged,Actual Fraud,Count,Meaning,Percentage of all
+1,1,16,Flagged and fraud,0.00025146873457789404
+1,0,0,Flagged but legitimate,0.0
+0,1,8197,Fraud NOT flagged,0.12883057608343731
+0,0,6354407,Not flagged and legitimate,99.87091795518198

@@ -1,0 +1,45 @@
+# Python virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Local datasets
+data/raw/
+
+# Environment and secret files
+.env
+.env.*
+
+# IDE/editor files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python distribution/build files
+build/
+dist/
+*.egg-info/
+
+# Test/cache files
+.pytest_cache/
+.coverage
+htmlcov/
+echo data/processed/ 
+data/raw/
+data/processed/
+venv/
+.venv/
+data/raw/
+data/processed/

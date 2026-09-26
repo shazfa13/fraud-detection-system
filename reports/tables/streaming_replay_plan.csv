@@ -1,0 +1,9 @@
+index,Metric,Value
+0,First streamed step,324.0
+1,Last streamed step,743.0
+2,Number of steps to replay,420.0
+3,Transactions to stream,1899033.0
+4,Mean transactions per step,4521.507142857143
+5,Peak transactions in one step,45155.0
+6,Minimum transactions in one step,2.0
+7,Fraud transactions in streamed period (labels to be delayed),4570.0

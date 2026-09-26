@@ -1,0 +1,35 @@
+Feature,Group,Description,Data Type,Prediction-Time Available,Leakage Risk,Final Action
+hour_of_day,Temporal,"Simulated hour within a 24-step cycle (0-23), relative to simulation start.",int8,Yes,SAFE,KEEP
+amount,Amount,Transaction amount.,float64,Yes,SAFE,KEEP
+log_amount,Amount,log(1 + amount); compresses the heavy right tail.,float32,Yes,SAFE,KEEP
+is_large_amount,Amount,1 if amount >= the training-period 99th percentile (constant fitted on training period only).,int8,Yes,SAFE,KEEP
+amount_to_sender_balance_ratio,Amount,Amount divided by the sender's balance BEFORE the transaction (NaN if that balance is 0).,float32,Yes (confirm snapshot timing),POTENTIAL_RISK,KEEP (POTENTIAL_RISK: verify in Phase 4 ablation)
+amount_ge_sender_balance,Amount,1 if the amount is >= the sender's pre-transaction balance (and the balance is > 0): the whole balance is requested.,int8,Yes (confirm snapshot timing),POTENTIAL_RISK,KEEP (POTENTIAL_RISK: verify in Phase 4 ablation)
+sender_remaining_if_debited,Amount,"Balance the sender WOULD have if the amount were debited (expected, not observed).",float32,Yes (confirm snapshot timing),POTENTIAL_RISK,KEEP (POTENTIAL_RISK: verify in Phase 4 ablation)
+amount_to_dest_balance_ratio,Amount,Amount divided by the destination's balance BEFORE the transaction (NaN if that balance is 0).,float32,Yes (confirm snapshot timing),POTENTIAL_RISK,KEEP (POTENTIAL_RISK: verify in Phase 4 ablation)
+sender_balance_before,Sender balance,Sender balance before the transaction.,float32,Yes (confirm snapshot timing),POTENTIAL_RISK,KEEP (POTENTIAL_RISK: verify in Phase 4 ablation)
+sender_balance_zero_before,Sender balance,1 if the sender's balance before the transaction is 0.,int8,Yes (confirm snapshot timing),POTENTIAL_RISK,KEEP (POTENTIAL_RISK: verify in Phase 4 ablation)
+dest_balance_before,Destination balance,Recipient balance before the transaction.,float32,Yes (confirm snapshot timing),POTENTIAL_RISK,KEEP (POTENTIAL_RISK: verify in Phase 4 ablation)
+dest_balance_zero_before,Destination balance,1 if the recipient's balance before the transaction is 0.,int8,Yes (confirm snapshot timing),POTENTIAL_RISK,KEEP (POTENTIAL_RISK: verify in Phase 4 ablation)
+sender_prev_txn_count,Account behaviour,Number of earlier transactions of this sender account.,int32,Yes (needs streaming state),SAFE,KEEP
+sender_prev_total_amount,Account behaviour,Total amount of earlier transactions of this sender account.,float32,Yes (needs streaming state),SAFE,KEEP
+sender_prev_mean_amount,Account behaviour,Mean amount of earlier transactions of this sender account (NaN if none).,float32,Yes (needs streaming state),SAFE,KEEP
+sender_prev_max_amount,Account behaviour,Largest earlier amount of this sender account (NaN if none).,float32,Yes (needs streaming state),SAFE,KEEP
+dest_prev_txn_count,Account behaviour,Number of earlier transactions of this destination account.,int32,Yes (needs streaming state),SAFE,KEEP
+dest_prev_total_amount,Account behaviour,Total amount of earlier transactions of this destination account.,float32,Yes (needs streaming state),SAFE,KEEP
+dest_prev_mean_amount,Account behaviour,Mean amount of earlier transactions of this destination account (NaN if none).,float32,Yes (needs streaming state),SAFE,KEEP
+dest_prev_max_amount,Account behaviour,Largest earlier amount of this destination account (NaN if none).,float32,Yes (needs streaming state),SAFE,KEEP
+amount_vs_sender_hist_mean,Account behaviour,Amount divided by the sender's earlier mean amount (NaN if no history).,float32,Yes (needs streaming state),SAFE,KEEP
+amount_vs_dest_hist_mean,Account behaviour,Amount divided by the destination's earlier mean received amount (NaN if no history).,float32,Yes (needs streaming state),SAFE,KEEP
+sender_hours_since_prev_txn,Velocity,Steps (hours) since the previous transaction of this sender account (NaN if none).,float32,Yes (needs streaming state),SAFE,KEEP
+dest_hours_since_prev_txn,Velocity,Steps (hours) since the previous transaction of this destination account (NaN if none).,float32,Yes (needs streaming state),SAFE,KEEP
+dest_txn_count_last_1h,Velocity,Earlier transactions of this destination account within the last 1 step(s) (same step only).,int32,Yes (needs streaming state),SAFE,KEEP
+dest_txn_count_last_24h,Velocity,Earlier transactions of this destination account within the last 24 step(s).,int32,Yes (needs streaming state),SAFE,KEEP
+dest_txn_count_last_168h,Velocity,Earlier transactions of this destination account within the last 168 step(s).,int32,Yes (needs streaming state),SAFE,KEEP
+dest_amount_sum_last_24h,Velocity,Total amount of earlier transactions of this destination account within the last 24 steps.,float32,Yes (needs streaming state),SAFE,KEEP
+dest_amount_sum_last_168h,Velocity,Total amount of earlier transactions of this destination account within the last 168 steps.,float32,Yes (needs streaming state),SAFE,KEEP
+type_CASH_IN,Transaction type,One-hot indicator: type == CASH_IN.,int8,Yes,SAFE,KEEP
+type_CASH_OUT,Transaction type,One-hot indicator: type == CASH_OUT.,int8,Yes,SAFE,KEEP
+type_DEBIT,Transaction type,One-hot indicator: type == DEBIT.,int8,Yes,SAFE,KEEP
+type_PAYMENT,Transaction type,One-hot indicator: type == PAYMENT.,int8,Yes,SAFE,KEEP
+type_TRANSFER,Transaction type,One-hot indicator: type == TRANSFER.,int8,Yes,SAFE,KEEP

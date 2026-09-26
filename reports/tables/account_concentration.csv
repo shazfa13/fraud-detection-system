@@ -1,0 +1,10 @@
+index,Sender (nameOrig),Destination (nameDest)
+Accounts,6353307.0,2722362.0
+Transactions from the top 1% busiest accounts (%),1.1449214317372403,14.347721536096765
+Busiest account: transactions,3.0,113.0
+Busiest account: share of all transactions (%),4.715038773335513e-05,0.0017759979379563765
+Accounts involved in fraud,8213.0,8169.0
+Accounts involved in fraud (% of accounts),0.12927125983365828,0.30007030659405326
+Fraud transactions carried by accounts with >=2 frauds (%),0.0,1.0714720564957994
+Fraud share of the top 10 fraud accounts (%),0.12175818823815901,0.24351637647631802
+Fraud share of the top 1% fraud accounts (%),1.0105929623767198,1.5341531718008037

@@ -1,0 +1,43 @@
+{
+  "transactions_attempted": 100,
+  "successful_predictions": 100,
+  "failed_predictions": 0,
+  "actual_fraud_cases_in_stream": 5,
+  "actual_legitimate_cases_in_stream": 95,
+  "predicted_fraud_cases": 5,
+  "labelled_transactions_at_evaluation": 98,
+  "actual_fraud_cases_available": 3,
+  "metrics_available_label_subset": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "pr_auc": 1.0,
+    "roc_auc": 1.0,
+    "tp": 3,
+    "tn": 95,
+    "fp": 0,
+    "fn": 0
+  },
+  "confusion_matrix": [
+    [
+      95,
+      0
+    ],
+    [
+      0,
+      3
+    ]
+  ],
+  "label_delay_seconds": 5,
+  "evaluation_time": "2026-09-26T14:27:01.891884+00:00",
+  "time_steps_represented": 3,
+  "model_version": "V1",
+  "selected_classification_threshold": 0.6,
+  "risk_score_matches_probability_percent": true,
+  "predicted_label_matches_threshold": true,
+  "average_api_latency_seconds": 0.061061961999876076,
+  "minimum_api_latency_seconds": 0.026476899998669978,
+  "maximum_api_latency_seconds": 0.4062958000031358,
+  "simulation_duration_seconds": 16.405298599998787,
+  "local_transactions_per_second": 6.095591579174755
+}

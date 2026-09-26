@@ -1,0 +1,17 @@
+Metric,Legitimate,Fraud,Ratio (Fraud/Legit),What the EDA shows,What this might mean for feature engineering
+Median amount,74684.72,441423.44,5.910491998898838,Fraud 4.414e+05 vs legitimate 7.468e+04 (×5.91),"log_amount, amount relative to balance / customer history"
+Mean amount,178197.04172740763,1467967.299140387,8.237888154091651,Fraud 1.468e+06 vs legitimate 1.782e+05 (×8.24),Check tail behaviour; consider amount-based bands
+Share of class in type 'CASH_OUT' (%),35.14700899706298,50.11567027882625,1.4258872008999146,Fraud 50.12 vs legitimate 35.15 (×1.43),One-hot/native categorical type; possible type × amount interactions
+Median step,239.0,367.0,1.5355648535564854,Fraud 367 vs legitimate 239 (×1.54),Absolute step is a poor feature (does not generalise); prefer hour-of-day style features
+Mean hour-of-day (relative),14.59557768333064,11.423109704127603,0.7826418352165493,Fraud 11.42 vs legitimate 14.6 (×0.78),Cyclic hour-of-day feature may capture time-of-day behaviour
+Median oldbalanceOrg,14069.0,438983.45,31.20217854858199,Fraud 4.39e+05 vs legitimate 1.407e+04 (×31.20),Balance-based ratios (pre-transaction only)
+% zero oldbalanceOrg,33.08582531776765,0.49920857177645195,0.015088291344764141,Fraud 0.4992 vs legitimate 33.09 (×0.02),Account-emptied indicators (check timing)
+Median newbalanceOrig,0.0,0.0,,Fraud 0 vs legitimate 0,POST-transaction value: leakage-suspect
+% zero newbalanceOrig,56.6774051457516,98.05186898818945,1.7299992604820085,Fraud 98.05 vs legitimate 56.68 (×1.73),Account-emptied indicators (check timing)
+Median oldbalanceDest,133311.8,0.0,0.0,Fraud 0 vs legitimate 1.333e+05 (×0.00),Balance-based ratios (pre-transaction only)
+% zero oldbalanceDest,42.475041337452886,65.15280652623889,1.5339080192675318,Fraud 65.15 vs legitimate 42.48 (×1.53),Zero-balance indicators (check whether zero means 'unknown')
+Median newbalanceDest,214881.7,4676.42,0.02176276527968645,"Fraud 4,676 vs legitimate 2.149e+05 (×0.02)",POST-transaction value: leakage-suspect
+% zero newbalanceDest,38.3252441966654,49.811274808230856,1.2996988239037712,Fraud 49.81 vs legitimate 38.33 (×1.30),Zero-balance indicators (check whether zero means 'unknown')
+Mean transactions of the sender account,1.0029315087938182,1.0034092292706684,1.0004763241284789,Fraud 1.003 vs legitimate 1.003 (×1.00),Sender-history features (use PAST data only)
+Mean transactions of the destination account,11.196240498916737,8.095336661390478,0.7230406190518792,Fraud 8.095 vs legitimate 11.2 (×0.72),Recipient-frequency / new-recipient features (PAST data only)
+% flagged by isFlaggedFraud,0.0,0.19481310118105444,,Fraud 0.1948 vs legitimate 0,Existing rule: requires modeling decision (risk of reproducing the rule)

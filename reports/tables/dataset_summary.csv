@@ -1,0 +1,9 @@
+Metric,Value
+Rows,6362620.0
+Columns,11.0
+Memory usage (MB),509.48
+CSV file size (MB),470.67
+Numeric columns,8.0
+Categorical/string columns,3.0
+Datetime-like columns,0.0
+Expected columns missing,0.0

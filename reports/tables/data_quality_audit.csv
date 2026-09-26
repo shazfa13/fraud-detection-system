@@ -1,0 +1,17 @@
+Check,Count,Percentage,Why it matters
+Missing cells (all columns),0,0.0,Missing inputs must be imputed or rejected; XGBoost can handle NaN but the stream must define behaviour.
+Rows with at least one missing value,0,0.0,Shows how widespread missingness is per record.
+Duplicate rows (all columns identical),0,0.0,Exact duplicates may be replayed/duplicated events and can inflate training counts.
+Duplicate transaction IDs (N/A - no transaction-ID column),0,0.0,PaySim has no transaction ID; the streaming design must generate its own event ID (e.g. row index).
+Infinite values (float columns),0,0.0,Infinite values break scaling/statistics and must be blocked in the stream.
+NaN values in numeric columns,0,0.0,Numeric NaNs need an explicit imputation policy.
+Negative amounts,0,0.0,A negative transaction amount is not meaningful.
+Zero amounts,16,0.00025146873457789404,Zero-value transactions may be test/probe transactions.
+Negative values in oldbalanceOrg,0,0.0,Negative balances would indicate overdraft or data errors.
+Negative values in newbalanceOrig,0,0.0,Negative balances would indicate overdraft or data errors.
+Negative values in oldbalanceDest,0,0.0,Negative balances would indicate overdraft or data errors.
+Negative values in newbalanceDest,0,0.0,Negative balances would indicate overdraft or data errors.
+"Unexpected 'type' values (expected ['CASH_IN', 'CASH_OUT', 'DEBIT', 'PAYMENT', 'TRANSFER'])",0,0.0,Unknown categories would break encoders. Unexpected values found: none.
+Non-positive 'step' values,0,0.0,Step is a 1-based simulated hour; values < 1 are impossible.
+"Target values outside {0,1}",0,0.0,Target must be strictly binary.
+"isFlaggedFraud values outside {0,1}",0,0.0,Flag must be strictly binary.

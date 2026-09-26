@@ -1,0 +1,3 @@
+index,Check,Count,Percentage,Why it matters
+2,Duplicate rows (all columns identical),0,0.0,Exact duplicates may be replayed/duplicated events and can inflate training counts.
+3,Duplicate transaction IDs (N/A - no transaction-ID column),0,0.0,PaySim has no transaction ID; the streaming design must generate its own event ID (e.g. row index).

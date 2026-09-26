@@ -1,0 +1,12 @@
+Column,Availability category,Information timing,Why it matters for the Kafka/Spark design
+step,1. Likely available before/during transaction,Transaction-time,Can be carried in the Kafka event and used by Spark (row-level; or as a STATE KEY for history features).
+type,1. Likely available before/during transaction,Transaction-time,Can be carried in the Kafka event and used by Spark (row-level; or as a STATE KEY for history features).
+amount,1. Likely available before/during transaction,Transaction-time,Can be carried in the Kafka event and used by Spark (row-level; or as a STATE KEY for history features).
+nameOrig,1. Likely available before/during transaction,Pre-transaction (identifier),Can be carried in the Kafka event and used by Spark (row-level; or as a STATE KEY for history features).
+oldbalanceOrg,1. Likely available before/during transaction,Pre-transaction,Can be carried in the Kafka event and used by Spark (row-level; or as a STATE KEY for history features). Confirm the exact snapshot timing first.
+newbalanceOrig,2. Potentially available only after transaction,Post-transaction,Must NOT be part of the scoring message. Keep separately for later analysis.
+nameDest,1. Likely available before/during transaction,Pre-transaction (identifier),Can be carried in the Kafka event and used by Spark (row-level; or as a STATE KEY for history features).
+oldbalanceDest,1. Likely available before/during transaction,Pre-transaction,Can be carried in the Kafka event and used by Spark (row-level; or as a STATE KEY for history features). Confirm the exact snapshot timing first.
+newbalanceDest,2. Potentially available only after transaction,Post-transaction,Must NOT be part of the scoring message. Keep separately for later analysis.
+isFraud,2. Potentially available only after transaction,Label (post-event),Must NOT be part of the scoring message. Keep separately for later analysis / delayed ground-truth join.
+isFlaggedFraud,3. Unclear / requires investigation,Rule-derived (timing unknown),Hold out of the Phase 3 baseline until investigated; decide and document.

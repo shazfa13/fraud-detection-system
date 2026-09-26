@@ -1,0 +1,31 @@
+feature,group,leakage_status,reason
+hour_sin,Temporal,SAFE,EXCLUDE: redundant with hour_of_day for tree models (kept for linear models)
+hour_cos,Temporal,SAFE,EXCLUDE: redundant with hour_of_day for tree models (kept for linear models)
+time_period_bin,Temporal,SAFE,EXCLUDE: coarser duplicate of hour_of_day
+day_index,Temporal,POTENTIAL_RISK,EXCLUDE: absolute time index encourages temporal over-fitting
+is_zero_amount,Amount,SAFE,EXCLUDE: near-zero variance (100.000% one value); definition retained for real-data reuse
+sender_balance_change,Sender balance,UNSAFE,EXCLUDE: UNSAFE - uses post-transaction information or the label
+sender_balance_ratio,Sender balance,UNSAFE,EXCLUDE: UNSAFE - uses post-transaction information or the label
+sender_balance_zero_after,Sender balance,UNSAFE,EXCLUDE: UNSAFE - uses post-transaction information or the label
+sender_balance_consistency,Sender balance,UNSAFE,EXCLUDE: UNSAFE - uses post-transaction information or the label
+dest_balance_change,Destination balance,UNSAFE,EXCLUDE: UNSAFE - uses post-transaction information or the label
+dest_balance_zero_after,Destination balance,UNSAFE,EXCLUDE: UNSAFE - uses post-transaction information or the label
+dest_balance_consistency,Destination balance,UNSAFE,EXCLUDE: UNSAFE - uses post-transaction information or the label
+sender_prev_unique_counterparties,Account behaviour,SAFE,EXCLUDE: exact duplicate of sender_prev_txn_count
+dest_prev_unique_counterparties,Account behaviour,SAFE,EXCLUDE: exact duplicate of dest_prev_txn_count
+is_new_destination_for_sender,Account behaviour,SAFE,EXCLUDE: constant in the training period
+sender_txn_count_last_1h,Velocity,SAFE,EXCLUDE: near-zero variance (99.999% one value); definition retained for real-data reuse
+sender_txn_count_last_24h,Velocity,SAFE,EXCLUDE: near-zero variance (99.982% one value); definition retained for real-data reuse
+sender_txn_count_last_168h,Velocity,SAFE,EXCLUDE: near-zero variance (99.922% one value); definition retained for real-data reuse
+sender_amount_sum_last_24h,Velocity,SAFE,EXCLUDE: near-zero variance (99.982% one value); definition retained for real-data reuse
+sender_amount_sum_last_168h,Velocity,SAFE,EXCLUDE: near-zero variance (99.922% one value); definition retained for real-data reuse
+sender_new_counterparties_last_24h,Velocity,SAFE,EXCLUDE: near-zero variance (99.982% one value); definition retained for real-data reuse
+sender_new_counterparties_last_168h,Velocity,SAFE,EXCLUDE: near-zero variance (99.922% one value); definition retained for real-data reuse
+dest_new_counterparties_last_24h,Velocity,SAFE,EXCLUDE: exact duplicate of dest_txn_count_last_24h
+dest_new_counterparties_last_168h,Velocity,SAFE,EXCLUDE: exact duplicate of dest_txn_count_last_168h
+isFraud,Target,UNSAFE,"Label - kept separately as the target, never an input feature"
+isFlaggedFraud,Rule-derived flag,POTENTIAL_RISK,Exclude | Prediction-time availability: the moment the rule sets the flag (before or after the score) is not documented -> cannot be guaranteed. Usefulness/variance: only 16 rows (0.00025%) are flagged -> near-zero variance.
+nameOrig,Identifier,SAFE,High-cardinality identifier; used only as a key for history features
+nameDest,Identifier,SAFE,High-cardinality identifier; used only as a key for history features
+oldbalanceOrg / oldbalanceDest,Raw balance,POTENTIAL_RISK,Represented by sender_balance_before / dest_balance_before
+newbalanceOrig / newbalanceDest,Raw balance,UNSAFE,Post-transaction information

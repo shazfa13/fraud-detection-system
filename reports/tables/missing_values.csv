@@ -1,0 +1,12 @@
+Column,Missing Count,Missing Percentage
+step,0,0.0
+type,0,0.0
+amount,0,0.0
+nameOrig,0,0.0
+oldbalanceOrg,0,0.0
+newbalanceOrig,0,0.0
+nameDest,0,0.0
+oldbalanceDest,0,0.0
+newbalanceDest,0,0.0
+isFraud,0,0.0
+isFlaggedFraud,0,0.0
