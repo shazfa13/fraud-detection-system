@@ -5,15 +5,15 @@
   "actual_fraud_cases_in_stream": 5,
   "actual_legitimate_cases_in_stream": 95,
   "predicted_fraud_cases": 5,
-  "labelled_transactions_at_evaluation": 98,
-  "actual_fraud_cases_available": 3,
+  "labelled_transactions_at_evaluation": 100,
+  "actual_fraud_cases_available": 5,
   "metrics_available_label_subset": {
     "precision": 1.0,
     "recall": 1.0,
     "f1": 1.0,
     "pr_auc": 1.0,
     "roc_auc": 1.0,
-    "tp": 3,
+    "tp": 5,
     "tn": 95,
     "fp": 0,
     "fn": 0
@@ -25,19 +25,39 @@
     ],
     [
       0,
-      3
+      5
     ]
   ],
   "label_delay_seconds": 5,
-  "evaluation_time": "2026-09-26T14:27:01.891884+00:00",
+  "evaluation_time": "2026-09-26T15:55:38.405918+00:00",
   "time_steps_represented": 3,
   "model_version": "V1",
   "selected_classification_threshold": 0.6,
   "risk_score_matches_probability_percent": true,
   "predicted_label_matches_threshold": true,
-  "average_api_latency_seconds": 0.061061961999876076,
-  "minimum_api_latency_seconds": 0.026476899998669978,
-  "maximum_api_latency_seconds": 0.4062958000031358,
-  "simulation_duration_seconds": 16.405298599998787,
-  "local_transactions_per_second": 6.095591579174755
+  "average_api_latency_seconds": 0.0313850179997462,
+  "minimum_api_latency_seconds": 0.014036500000656815,
+  "maximum_api_latency_seconds": 0.5680308000009973,
+  "simulation_duration_seconds": 13.51024569999936,
+  "local_transactions_per_second": 7.401789887507726,
+  "evaluation_type": "selected_live_demonstration",
+  "generalization_claim": false,
+  "interpretation": "The Phase 6 metrics describe this selected live demonstration and should not be interpreted as overall Model V1 performance.",
+  "primary_model_evaluation": "Phase 4 full chronological test-set metrics remain the primary Model V1 performance evidence.",
+  "phase4_test_metrics": {
+    "Split": "Test",
+    "Precision": 0.9764590485532123,
+    "Recall": 0.9940089865202196,
+    "F1": 0.9851558634339436,
+    "PR-AUC": 0.9945875253387243,
+    "ROC-AUC": 0.9999523835278865
+  },
+  "historical_warmup_rows": 95,
+  "warmup_excluded_from_live_metrics": true,
+  "feature_parity_passed": true,
+  "prediction_parity_passed": true,
+  "parity_tolerance": {
+    "rtol": 1e-06,
+    "atol": 1e-06
+  }
 }

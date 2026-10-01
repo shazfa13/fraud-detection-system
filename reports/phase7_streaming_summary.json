@@ -1,0 +1,96 @@
+{
+  "phase": "Phase 7 - Kafka + Spark Structured Streaming",
+  "topic": "fraud-transactions",
+  "raw_dataset_rows": null,
+  "raw_dataset_looks_like_full_paysim": false,
+  "data_source_note": "Results come from the raw CSV present when this notebook ran. Real PaySim has ~6.36M rows; if raw_dataset_rows is far smaller, the CSV was a synthetic PaySim-shaped stand-in and these numbers are not claims about real data. Re-run locally to regenerate.",
+  "transport_used": "kafka",
+  "real_kafka_broker_available_in_this_run": true,
+  "spark_kafka_connector_available_in_this_run": true,
+  "transactions_streamed": 20,
+  "predictions_generated": 20,
+  "errors_detected_in_spark_log": 2,
+  "model_version": "V1",
+  "feature_count": 34,
+  "classification_threshold": 0.6,
+  "risk_level_counts": {
+    "MEDIUM": 20
+  },
+  "predicted_fraud_count": 0,
+  "fraud_probability_distinct_values": 7,
+  "checks": {
+    "Kafka payload contains no isFraud (inspected transport messages)": "PASS",
+    "Streaming schema has no isFraud": "PASS",
+    "Prediction output has no isFraud column": "PASS",
+    ">= 20 transactions processed": "PASS",
+    "Model version is V1 for every prediction": "PASS",
+    "34-feature contract (checked per transaction inside process_batch; run aborts otherwise)": "PASS",
+    "fraud_probability numeric in [0,1]": "PASS",
+    "Existing threshold applied": "PASS",
+    "risk_score = fraud_probability x 100": "PASS",
+    "Risk levels follow existing bands": "PASS",
+    "Events processed chronologically": "PASS",
+    "Historical state past-only (self-exclusion)": "PASS",
+    "Future events do not affect earlier features": "PASS",
+    "Output persisted to CSV": "PASS",
+    "Checkpoint written (offsets/commits recorded)": "PASS",
+    "Checkpoint restart does not reprocess old data": "PASS",
+    "Model V1 file, metadata, threshold, Phase 4 metrics unchanged (hash)": "PASS",
+    "Phase 3 <-> Phase 7 feature parity": "PASS",
+    "Prediction parity (same Model V1)": "PASS",
+    "Model feature list has no isFraud": "PASS",
+    "Prediction inputs have no isFraud": "PASS",
+    "Actual labels are not passed to prediction path": "PASS"
+  },
+  "feature_parity": {
+    "transactions_compared": 20,
+    "features_compared": 34,
+    "values_compared": 680,
+    "differing_features": {},
+    "max_abs_difference": 0.0,
+    "tolerance": {
+      "rtol": 1e-12,
+      "atol": 1e-12
+    },
+    "result": "PASS"
+  },
+  "prediction_parity": {
+    "predictions_compared": 20,
+    "max_abs_probability_difference": 5.551115123125783e-17,
+    "mean_abs_probability_difference": 4.9960036108132046e-17,
+    "tolerance": {
+      "rtol": 1e-12,
+      "atol": 1e-12
+    },
+    "result": "PASS"
+  },
+  "latency_seconds_local_bridge": null,
+  "model_hashes_before": {
+    "models/xgboost_model_v1.json": "7c72da959fd9d98411b758f65f3b1ea1b43fbec1a854facea064a5f1ec0c7488",
+    "models/model_v1_metadata.json": "c32705e031e93b5766a8b10fce24023bd5240a800b1238cf97f13797ad0428c4",
+    "models/model_v1_threshold.json": "16317aa3c4944669c631b864df030aa6cd8b09e292a29d9dfd4d040c503067a6",
+    "reports/model_v1_metrics.csv": "956a2664616dd119e8a129e557ab04bf2123ba460f4a7f842312470648d13a85"
+  },
+  "model_hashes_after": {
+    "models/xgboost_model_v1.json": "7c72da959fd9d98411b758f65f3b1ea1b43fbec1a854facea064a5f1ec0c7488",
+    "models/model_v1_metadata.json": "c32705e031e93b5766a8b10fce24023bd5240a800b1238cf97f13797ad0428c4",
+    "models/model_v1_threshold.json": "16317aa3c4944669c631b864df030aa6cd8b09e292a29d9dfd4d040c503067a6",
+    "reports/model_v1_metrics.csv": "956a2664616dd119e8a129e557ab04bf2123ba460f4a7f842312470648d13a85"
+  },
+  "model_unchanged": true,
+  "status": {
+    "Kafka (real broker)": "PASS",
+    "Kafka topic": "PASS",
+    "Kafka producer - message construction (no isFraud, chronological)": "PASS",
+    "Kafka producer - delivery over the Kafka wire protocol": "PASS",
+    "Spark Structured Streaming": "PASS",
+    "JSON parsing (explicit schema)": "PASS",
+    "Feature engineering (reused Phase 5 code, 34-feature contract)": "PASS",
+    "XGBoost V1 integration": "PASS",
+    "Prediction output": "PASS",
+    "Checkpointing": "PASS",
+    "Ground-truth leakage check": "PASS",
+    "End-to-end streaming (real Kafka -> Spark -> Model V1)": "PASS",
+    "End-to-end streaming (kafka transport -> Spark -> Model V1)": "PASS"
+  }
+}

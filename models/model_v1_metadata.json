@@ -128,6 +128,14 @@
     "n_jobs": -1,
     "early_stopping_rounds": 30
   },
+  "artifact_reconciliation": {
+    "status": "documented_ambiguity",
+    "authoritative_source": "models/xgboost_model_v1.json",
+    "objective_observed_in_artifact": "binary:logistic",
+    "tree_count_observed_in_artifact": 36,
+    "maximum_tree_depth_observed_in_artifact": 5,
+    "note": "The serialized XGBoost artifact preserves the fitted trees and objective, but does not expose every scikit-learn wrapper fit parameter as reliable recoverable training provenance after reload. xgboost_parameters above remain the recorded Phase 4 training configuration; no artifact values were changed. Predictions from the artifact remain the authority for deployment."
+  },
   "dataset_info": {
     "source_file": "..\\data\\processed\\featured_transactions.parquet",
     "total_rows": 6362620,

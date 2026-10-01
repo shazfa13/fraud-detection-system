@@ -26,6 +26,7 @@ from __future__ import annotations
 import json
 import logging
 import math
+from copy import deepcopy
 from collections import deque
 from datetime import datetime, timezone
 from pathlib import Path
@@ -160,6 +161,11 @@ class AccountState:
         self._state = {"sender": {}, "dest": {}}
         self._pairs: set[tuple[str, str]] = set()
 
+    def reset(self) -> None:
+        """Clear process-local history before a deterministic replay or demo run."""
+        self._state = {"sender": {}, "dest": {}}
+        self._pairs = set()
+
     @staticmethod
     def _new_account() -> dict:
         return {"count": 0, "total": 0.0, "max": float("nan"), "last_step": None, "uniq": 0, "events": deque()}
@@ -209,13 +215,22 @@ class AccountState:
     def account_count(self) -> dict:
         return {"sender_accounts_tracked": len(self._state["sender"]), "dest_accounts_tracked": len(self._state["dest"])}
 
+    def preview_features(self, sender: str, dest: str, step: int, amount: float) -> dict:
+        """Compute one feature state without consuming the event, for parity validation only."""
+        state, pairs = self._state, self._pairs
+        self._state, self._pairs = deepcopy(state), set(pairs)
+        try:
+            return self.compute_and_update(sender, dest, step, amount)
+        finally:
+            self._state, self._pairs = state, pairs
+
 
 # One shared, process-wide state instance (see AccountState docstring for its scope/limitations).
 account_state = AccountState()
 
 
 
-def build_feature_vector(txn: "TransactionRequest") -> pd.DataFrame:
+def build_feature_vector(txn: "TransactionRequest", update_state: bool = True) -> pd.DataFrame:
     """
     Full pipeline: raw transaction -> candidate SAFE/POTENTIAL_RISK features -> exact Model V1
     feature names, in the exact expected order. Raises ValueError (-> HTTP 400) on any mismatch
@@ -225,7 +240,9 @@ def build_feature_vector(txn: "TransactionRequest") -> pd.DataFrame:
     candidate.update(create_temporal_features(txn.step))
     candidate.update(create_amount_features(txn.amount, txn.oldbalanceOrg, txn.oldbalanceDest))
     candidate.update(create_balance_features(txn.oldbalanceOrg, txn.oldbalanceDest))
-    candidate.update(account_state.compute_and_update(txn.nameOrig, txn.nameDest, txn.step, txn.amount))
+    state_features = (account_state.compute_and_update(txn.nameOrig, txn.nameDest, txn.step, txn.amount)
+                      if update_state else account_state.preview_features(txn.nameOrig, txn.nameDest, txn.step, txn.amount))
+    candidate.update(state_features)
     candidate.update(encode_transaction_type(txn.type))
     if RETAIN_FLAG_FEATURE:
         candidate["is_flagged_by_rule"] = int(txn.isFlaggedFraud or 0)
@@ -325,6 +342,30 @@ def root():
 @app.get("/health")
 def health():
     return {"status": "healthy", "model_loaded": model is not None, "model_version": MODEL_VERSION}
+
+
+@app.post("/state/reset")
+def reset_state():
+    """Development-only reset for deterministic historical replay before Phase 6."""
+    account_state.reset()
+    return {"status": "reset", "account_state": account_state.account_count()}
+
+
+@app.post("/state/warmup")
+def warmup_state(transactions: list[TransactionRequest]):
+    """Replay pre-live transactions into AccountState without model prediction or logging."""
+    for txn in transactions:
+        account_state.compute_and_update(txn.nameOrig, txn.nameDest, txn.step, txn.amount)
+    return {"status": "warmed", "processed_transactions": len(transactions),
+            "account_state": account_state.account_count()}
+
+@app.post("/state/preview")
+def preview_state(txn: TransactionRequest):
+    """Return the exact Model V1 feature vector without consuming the transaction."""
+    row = build_feature_vector(txn, update_state=False).iloc[0]
+    features = {name: (None if pd.isna(value) else float(value)) for name, value in row.items()}
+    return {"features": features,
+            "feature_names": FINAL_FEATURES}
 
 
 @app.post("/predict", response_model=PredictionResponse)

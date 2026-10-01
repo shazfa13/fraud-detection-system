@@ -14,6 +14,7 @@ __pycache__/
 
 # Local datasets
 data/raw/
+data/processed/
 
 # Environment and secret files
 .env
@@ -36,10 +37,3 @@ dist/
 .pytest_cache/
 .coverage
 htmlcov/
-echo data/processed/ 
-data/raw/
-data/processed/
-venv/
-.venv/
-data/raw/
-data/processed/
