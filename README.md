@@ -10,8 +10,10 @@ Final-year B.Tech CSE project implementing Phases 1-6 of an adaptive financial f
 4. **Phase 4:** Chronological XGBoost Model V1 training and evaluation
 5. **Phase 5:** FastAPI deployment of Model V1
 6. **Phase 6:** Live transaction simulation with delayed ground truth
+7. **Phase 7:** Kafka and Spark Structured Streaming validation
+8. **Phase 8:** Drift monitoring only (no retraining or Model V2 deployment)
 
-Kafka, Spark Structured Streaming, SHAP, counterfactual explanations, drift monitoring, Model V2, automated retraining, and a React dashboard are not implemented yet.
+SHAP, counterfactual explanations, Model V2, automated retraining, and a React dashboard are not implemented yet.
 
 ## Dataset and generated data
 
@@ -77,6 +79,23 @@ The Phase 5 API loads Model V1 once and maintains development-only process-local
 Before the selected live evaluation window, Phase 6 resets the development API state and replays only the chronological prefix needed for accounts present in the live window. Warm-up transactions reconstruct prediction-time account state; they are not counted as live predictions and their labels are never sent to the API.
 
 The live request excludes `isFraud`. Ground truth is stored separately and becomes available using a logical delay timestamp.
+
+## Phase 8 drift monitoring
+
+Run `notebooks/08_drift_detection.ipynb` after the Phase 3-7 artifacts are available. The monitor compares
+the Model V1 training window (steps 1-323) with the later test/live window (step 379 onward); validation
+steps 324-378 are deliberately excluded. It uses reference-decile PSI plus a two-sample KS test for
+continuous features and a two-proportion z-test for binary features, with Benjamini-Hochberg correction.
+A feature is drifted when PSI is at least 0.20 or its adjusted test p-value is below 0.05; overall drift
+is reported when at least 15% of tested features drift. `isFraud` and other ground truth are excluded.
+
+The notebook prefers `data/processed/featured_transactions.parquet`. If it is unavailable, it reconstructs
+features by replaying the complete raw transaction stream through the existing Phase 3/5 feature pipeline,
+without resetting account state at the window boundary. Raw and processed data are checked for the expected
+full PaySim row count. Sample or synthetic inputs are explicitly marked `SAMPLE_OR_SYNTHETIC` and
+`NON-FINAL DATASET RUN`; they must not be presented as the official full-data result. The controlled
+synthetic drift demonstration is separate from the production monitoring decision. Phase 8 stops after
+reporting drift and does not retrain or create Model V2.
 
 ## Evaluation interpretation
 

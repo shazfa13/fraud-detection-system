@@ -1,0 +1,104 @@
+{
+  "phase": "Phase 8",
+  "status": "complete",
+  "data_source": {
+    "type": "processed_parquet",
+    "path": "D:\\fraud-detection-system\\fraud-detection-system\\data\\processed\\featured_transactions.parquet",
+    "raw_dataset_rows": 6362620,
+    "raw_dataset_looks_like_full_paysim": true,
+    "dataset_identity_status": "FULL_DATASET"
+  },
+  "dataset_identity": "FULL_DATASET",
+  "dataset_warning": null,
+  "reference_period": {
+    "description": "Training period (the data Model V1 was actually fitted on)",
+    "min_step": 1,
+    "max_step": 323
+  },
+  "recent_period": {
+    "description": "Test period (transactions Model V1 never trained on; same period Phase 6/7 use as 'live')",
+    "min_step": 379,
+    "max_step": null
+  },
+  "excluded_period": {
+    "description": "Validation period - deliberately excluded from both windows so they never overlap",
+    "min_step": 324,
+    "max_step": 378
+  },
+  "reference_samples": 4463587,
+  "recent_samples": 918617,
+  "features_tested": 34,
+  "features_drifted": 31,
+  "features_insufficient_sample": 0,
+  "drift_percentage": 91.17647058823529,
+  "overall_drift_detected": true,
+  "decision_rule": "overall_drift_detected = (features_tested > 0) AND (features_drifted / features_tested >= 0.15)",
+  "strongest_drifted_features": [
+    "dest_hours_since_prev_txn",
+    "sender_hours_since_prev_txn",
+    "dest_txn_count_last_24h",
+    "dest_txn_count_last_168h",
+    "dest_amount_sum_last_24h"
+  ],
+  "psi_thresholds": {
+    "watch": 0.1,
+    "significant": 0.2
+  },
+  "ks_alpha": 0.05,
+  "multiple_testing_method": "benjamini_hochberg",
+  "test_method_by_feature_type": {
+    "continuous": "PSI + two-sample KS test",
+    "binary": "PSI + two-proportion z-test"
+  },
+  "min_sample_size": 30,
+  "ground_truth_used": false,
+  "controlled_demonstration": {
+    "feature": "amount",
+    "shift_multiplier": 3.0,
+    "real_psi": 0.002244217378008335,
+    "synthetic_psi": 0.6397898624304317,
+    "synthetic_ks_statistic": 0.29397647308031827,
+    "synthetic_ks_p_value": 0.0,
+    "note": "Separate from, and never mixed into, the real monitoring result."
+  },
+  "validation_checks": {
+    "Reference data loaded": true,
+    "Recent data loaded": true,
+    "Reference period precedes recent period": true,
+    "Feature contract matches (34 features, names+order)": true,
+    "Required feature count correct": true,
+    "No isFraud in drift inputs": true,
+    "No ground-truth leakage": true,
+    "No NaN/Inf problems in computed PSI values": true,
+    "PSI calculations valid (non-negative)": true,
+    "KS/proportion calculations valid (correct statistic ranges and p in [0,1])": true,
+    "Multiple-testing correction valid (BH, monotonic vs raw p)": true,
+    "Feature-level drift results generated": true,
+    "Overall drift decision generated": true,
+    "Reports generated": true,
+    "Figures generated": true,
+    "Model V1 integrity unchanged": true,
+    "Phase 7 artifacts unchanged": true,
+    "src/api/app.py unchanged": true,
+    "Reproducibility (deterministic reference/recent windows + fixed config)": true
+  },
+  "phase7_integrity": "UNCHANGED",
+  "model_v1_hash_before": {
+    "models/xgboost_model_v1.json": "7c72da959fd9d98411b758f65f3b1ea1b43fbec1a854facea064a5f1ec0c7488",
+    "models/model_v1_metadata.json": "c32705e031e93b5766a8b10fce24023bd5240a800b1238cf97f13797ad0428c4",
+    "models/model_v1_threshold.json": "16317aa3c4944669c631b864df030aa6cd8b09e292a29d9dfd4d040c503067a6",
+    "src/api/app.py": "78086e51c70e1f484da13bb782c24a775221467fd389f0331a869384da239987",
+    "src/streaming/kafka_producer.py": "097720160069d5f48f4318ac02f10cdbe7c75b282dbfbf4689b40fe7b9ab1ba8",
+    "src/streaming/spark_streaming.py": "50cd91b66a2a69709b1f0ed54eea1c2b8873827b3ee1c0ea7f2039321969365e"
+  },
+  "model_v1_hash_after": {
+    "models/xgboost_model_v1.json": "7c72da959fd9d98411b758f65f3b1ea1b43fbec1a854facea064a5f1ec0c7488",
+    "models/model_v1_metadata.json": "c32705e031e93b5766a8b10fce24023bd5240a800b1238cf97f13797ad0428c4",
+    "models/model_v1_threshold.json": "16317aa3c4944669c631b864df030aa6cd8b09e292a29d9dfd4d040c503067a6",
+    "src/api/app.py": "78086e51c70e1f484da13bb782c24a775221467fd389f0331a869384da239987",
+    "src/streaming/kafka_producer.py": "097720160069d5f48f4318ac02f10cdbe7c75b282dbfbf4689b40fe7b9ab1ba8",
+    "src/streaming/spark_streaming.py": "50cd91b66a2a69709b1f0ed54eea1c2b8873827b3ee1c0ea7f2039321969365e"
+  },
+  "model_v1_unchanged": true,
+  "generated_at_utc": "2026-10-02T13:45:13.823282+00:00"
+}

@@ -12,3 +12,13 @@ scikit-learn>=1.5
 requests>=2.31
 joblib>=1.3
 # optional (reduces RAM use when loading the ~6.3M-row CSV): pyarrow
+
+# optional (reduces RAM use when loading the ~6.3M-row CSV): pyarrow
+
+# Phase 7 — Kafka + Spark Structured Streaming
+pyspark>=4.0
+kafka-python>=3.0
+# requires a local JDK (11+) on PATH for pyspark - see notebooks/07_kafka_spark_streaming.ipynb
+
+# Phase 8 — Drift Detection
+scipy>=1.10
