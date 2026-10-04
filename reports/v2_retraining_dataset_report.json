@@ -1,0 +1,159 @@
+{
+  "phase": "Phase 10",
+  "status": "complete",
+  "old_training_source": "Phase 3 processed dataset (featured_transactions.parquet), filtered to the reference window",
+  "recent_labelled_source": "data\\processed\\recent_labelled_data.parquet (Phase 9's own output, read-only, audit-only columns dropped)",
+  "output_dataset": "data\\processed\\v2_retraining_dataset.parquet",
+  "raw_dataset_rows": 6362620,
+  "raw_dataset_looks_like_full_paysim": true,
+  "old_training_rows": 4463587,
+  "recent_labelled_rows": 918617,
+  "combined_rows": 5382204,
+  "old_training_step_range": [
+    1,
+    323
+  ],
+  "recent_step_range": [
+    379,
+    743
+  ],
+  "excluded_validation_step_range": [
+    324,
+    378
+  ],
+  "feature_count": 34,
+  "feature_names": [
+    "hour_of_day",
+    "amount",
+    "log_amount",
+    "is_large_amount",
+    "amount_to_sender_balance_ratio",
+    "amount_ge_sender_balance",
+    "sender_remaining_if_debited",
+    "amount_to_dest_balance_ratio",
+    "sender_balance_before",
+    "sender_balance_zero_before",
+    "dest_balance_before",
+    "dest_balance_zero_before",
+    "sender_prev_txn_count",
+    "sender_prev_total_amount",
+    "sender_prev_mean_amount",
+    "sender_prev_max_amount",
+    "dest_prev_txn_count",
+    "dest_prev_total_amount",
+    "dest_prev_mean_amount",
+    "dest_prev_max_amount",
+    "amount_vs_sender_hist_mean",
+    "amount_vs_dest_hist_mean",
+    "sender_hours_since_prev_txn",
+    "dest_hours_since_prev_txn",
+    "dest_txn_count_last_1h",
+    "dest_txn_count_last_24h",
+    "dest_txn_count_last_168h",
+    "dest_amount_sum_last_24h",
+    "dest_amount_sum_last_168h",
+    "type_CASH_IN",
+    "type_CASH_OUT",
+    "type_DEBIT",
+    "type_PAYMENT",
+    "type_TRANSFER"
+  ],
+  "target_column": "isFraud",
+  "target_not_in_features": true,
+  "event_id_column": "event_id",
+  "duplicate_checks": {
+    "old_duplicate_event_id": 0,
+    "recent_duplicate_event_id": 0,
+    "combined_duplicate_event_id": 0,
+    "old_recent_event_id_overlap": 0
+  },
+  "temporal_checks": {
+    "old dataset contains no step inside the validation gap": true,
+    "recent dataset contains no step inside the validation gap": true,
+    "old dataset entirely precedes the validation gap": true,
+    "recent dataset entirely follows the validation gap": true,
+    "combined_sorted_chronologically": true
+  },
+  "label_quality_checks": {
+    "schema_validation_old": {
+      "[OLD] 34 features present, exact names": true,
+      "[OLD] target 'isFraud' present": true,
+      "[OLD] target not among the 34 features": true,
+      "[OLD] no duplicate event_id": true,
+      "[OLD] no null target values": true,
+      "[OLD] target values only 0/1": true,
+      "[OLD] step range within expected bounds": true,
+      "[OLD] feature dtypes numeric": true,
+      "[OLD] no audit-only columns present": true,
+      "[OLD] no nameOrig/nameDest columns present": true
+    },
+    "schema_validation_recent": {
+      "[RECENT] 34 features present, exact names": true,
+      "[RECENT] target 'isFraud' present": true,
+      "[RECENT] target not among the 34 features": true,
+      "[RECENT] no duplicate event_id": true,
+      "[RECENT] no null target values": true,
+      "[RECENT] target values only 0/1": true,
+      "[RECENT] step range within expected bounds": true,
+      "[RECENT] feature dtypes numeric": true,
+      "[RECENT] no audit-only columns present": true,
+      "[RECENT] no nameOrig/nameDest columns present": true
+    },
+    "schema_validation_combined": {
+      "[COMBINED] 34 features present, exact names": true,
+      "[COMBINED] target 'isFraud' present": true,
+      "[COMBINED] target not among the 34 features": true,
+      "[COMBINED] no duplicate event_id": true,
+      "[COMBINED] no null target values": true,
+      "[COMBINED] target values only 0/1": true,
+      "[COMBINED] step range within expected bounds": true,
+      "[COMBINED] feature dtypes numeric": true,
+      "[COMBINED] no audit-only columns present": true,
+      "[COMBINED] no nameOrig/nameDest columns present": true,
+      "[COMBINED] no row falls inside the validation gap (324-378)": true
+    }
+  },
+  "class_distribution": {
+    "old": {
+      "total_rows": 4463587,
+      "fraud_count": 3643,
+      "legitimate_count": 4459944,
+      "fraud_rate": 0.0008161597387930379
+    },
+    "recent": {
+      "total_rows": 918617,
+      "fraud_count": 4006,
+      "legitimate_count": 914611,
+      "fraud_rate": 0.004360903401526425
+    },
+    "combined": {
+      "total_rows": 5382204,
+      "fraud_count": 7649,
+      "legitimate_count": 5374555,
+      "fraud_rate": 0.0014211650097246406
+    }
+  },
+  "class_balancing_applied": false,
+  "smote_applied": false,
+  "synthetic_labels_created": false,
+  "random_sampling": false,
+  "ground_truth_used_for_features": false,
+  "leakage_checks": {
+    "isFraud not in the 34-feature contract": true,
+    "event_id not in the 34-feature contract": true,
+    "step not in the 34-feature contract (unless already part of it)": true,
+    "nameOrig not a column of the combined dataset": true,
+    "nameDest not a column of the combined dataset": true,
+    "fraud_probability (prediction output) not a column": true,
+    "predicted_label (prediction output) not a column": true,
+    "risk_score (prediction output) not a column": true,
+    "risk_level (prediction output) not a column": true,
+    "combined dataset columns are exactly [event_id, step] + 34 features + [isFraud]": true
+  },
+  "leakage_check_passed": true,
+  "v1_model_modified": false,
+  "phase8_modified": false,
+  "phase9_modified": false,
+  "phase10_end_to_end": true,
+  "generated_at_utc": "2026-10-04T12:33:29.690049+00:00"
+}
