@@ -1,0 +1,48 @@
+{
+  "phase": "Phase 11",
+  "v1_on_v2_test_split": {
+    "precision": 0.9918200408997955,
+    "recall": 0.9918200408997955,
+    "f1": 0.9918200408997955,
+    "pr_auc": 0.9981653820636431,
+    "roc_auc": 0.9999269841629729,
+    "accuracy": 0.9998238118310355,
+    "tp": 1940,
+    "tn": 179652,
+    "fp": 16,
+    "fn": 16,
+    "rows": 181624,
+    "fraud_count": 1956,
+    "fraud_rate": 0.010769501827952253,
+    "threshold": 0.6
+  },
+  "v2_on_v2_test_split": {
+    "precision": 0.998467824310521,
+    "recall": 0.9994887525562373,
+    "f1": 0.9989780275932549,
+    "pr_auc": 0.9994901150829729,
+    "roc_auc": 0.9996823412717654,
+    "accuracy": 0.9999779764788794,
+    "tp": 1955,
+    "tn": 179665,
+    "fp": 3,
+    "fn": 1,
+    "rows": 181624,
+    "fraud_count": 1956,
+    "fraud_rate": 0.010769501827952253,
+    "threshold": 0.53
+  },
+  "decision_criteria": {
+    "v2_f1_not_lower_than_v1": true,
+    "v2_pr_auc_not_lower_than_v1": true,
+    "v2_recall_not_lower_than_v1": true
+  },
+  "decision_reasons": [
+    "v2_f1_not_lower_than_v1: PASS",
+    "v2_pr_auc_not_lower_than_v1: PASS",
+    "v2_recall_not_lower_than_v1: PASS"
+  ],
+  "decision": "V2_CANDIDATE_FOR_DEPLOYMENT",
+  "v1_training_history": "Trained on steps <= 323 (Phase 4's own split)",
+  "v2_training_history": "Trained on steps 1-422 (Phase 10 OLD window + recent training-extension)"
+}

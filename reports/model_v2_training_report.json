@@ -1,0 +1,287 @@
+{
+  "phase": "Phase 11",
+  "status": "complete",
+  "dataset_source": "data\\processed\\v2_retraining_dataset.parquet",
+  "raw_dataset_rows": 5382204,
+  "raw_dataset_looks_like_full_paysim": true,
+  "feature_count": 34,
+  "feature_names": [
+    "hour_of_day",
+    "amount",
+    "log_amount",
+    "is_large_amount",
+    "amount_to_sender_balance_ratio",
+    "amount_ge_sender_balance",
+    "sender_remaining_if_debited",
+    "amount_to_dest_balance_ratio",
+    "sender_balance_before",
+    "sender_balance_zero_before",
+    "dest_balance_before",
+    "dest_balance_zero_before",
+    "sender_prev_txn_count",
+    "sender_prev_total_amount",
+    "sender_prev_mean_amount",
+    "sender_prev_max_amount",
+    "dest_prev_txn_count",
+    "dest_prev_total_amount",
+    "dest_prev_mean_amount",
+    "dest_prev_max_amount",
+    "amount_vs_sender_hist_mean",
+    "amount_vs_dest_hist_mean",
+    "sender_hours_since_prev_txn",
+    "dest_hours_since_prev_txn",
+    "dest_txn_count_last_1h",
+    "dest_txn_count_last_24h",
+    "dest_txn_count_last_168h",
+    "dest_amount_sum_last_24h",
+    "dest_amount_sum_last_168h",
+    "type_CASH_IN",
+    "type_CASH_OUT",
+    "type_DEBIT",
+    "type_PAYMENT",
+    "type_TRANSFER"
+  ],
+  "target": "isFraud",
+  "temporal_split": {
+    "train": {
+      "start_step": 1,
+      "end_step": 422,
+      "rows": 5015193
+    },
+    "validation": {
+      "start_step": 423,
+      "end_step": 565,
+      "rows": 185387
+    },
+    "test": {
+      "start_step": 566,
+      "end_step": 743,
+      "rows": 181624
+    }
+  },
+  "class_distribution": {
+    "train": {
+      "rows": 5015193,
+      "fraud_count": 4201,
+      "legitimate_count": 5010992,
+      "fraud_rate": 0.0008376547024212229
+    },
+    "validation": {
+      "rows": 185387,
+      "fraud_count": 1492,
+      "legitimate_count": 183895,
+      "fraud_rate": 0.008048029257714943
+    },
+    "test": {
+      "rows": 181624,
+      "fraud_count": 1956,
+      "legitimate_count": 179668,
+      "fraud_rate": 0.010769501827952253
+    }
+  },
+  "scale_pos_weight": 1192.8093311116402,
+  "xgboost_parameters": {
+    "n_estimators": 300,
+    "max_depth": 5,
+    "learning_rate": 0.05,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "min_child_weight": 5,
+    "reg_lambda": 1.0,
+    "gamma": 0.0,
+    "scale_pos_weight": 1192.8093311116402,
+    "objective": "binary:logistic",
+    "eval_metric": "aucpr",
+    "tree_method": "hist",
+    "random_state": 42,
+    "n_jobs": -1,
+    "early_stopping_rounds": 30
+  },
+  "best_iteration": 2,
+  "training_seconds": 266.60035830000015,
+  "threshold_selection": {
+    "method": "maximum F1 on the validation split only",
+    "selected_threshold": 0.53,
+    "validation_metrics_at_threshold": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    }
+  },
+  "v2_metrics": {
+    "train": {
+      "precision": 0.9392712550607287,
+      "recall": 0.9940490359438229,
+      "f1": 0.9658841216606916,
+      "pr_auc": 0.9942676081890863,
+      "roc_auc": 0.999684010785899,
+      "accuracy": 0.999941178734298,
+      "tp": 4176,
+      "tn": 5010722,
+      "fp": 270,
+      "fn": 25,
+      "rows": 5015193,
+      "fraud_count": 4201,
+      "fraud_rate": 0.0008376547024212229,
+      "threshold": 0.53
+    },
+    "validation": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "pr_auc": 1.0,
+      "roc_auc": 1.0,
+      "accuracy": 1.0,
+      "tp": 1492,
+      "tn": 183895,
+      "fp": 0,
+      "fn": 0,
+      "rows": 185387,
+      "fraud_count": 1492,
+      "fraud_rate": 0.008048029257714943,
+      "threshold": 0.53
+    },
+    "test": {
+      "precision": 0.998467824310521,
+      "recall": 0.9994887525562373,
+      "f1": 0.9989780275932549,
+      "pr_auc": 0.9994901150829729,
+      "roc_auc": 0.9996823412717654,
+      "accuracy": 0.9999779764788794,
+      "tp": 1955,
+      "tn": 179665,
+      "fp": 3,
+      "fn": 1,
+      "rows": 181624,
+      "fraud_count": 1956,
+      "fraud_rate": 0.010769501827952253,
+      "threshold": 0.53
+    }
+  },
+  "v1_metrics": {
+    "on_v2_test_split": {
+      "precision": 0.9918200408997955,
+      "recall": 0.9918200408997955,
+      "f1": 0.9918200408997955,
+      "pr_auc": 0.9981653820636431,
+      "roc_auc": 0.9999269841629729,
+      "accuracy": 0.9998238118310355,
+      "tp": 1940,
+      "tn": 179652,
+      "fp": 16,
+      "fn": 16,
+      "rows": 181624,
+      "fraud_count": 1956,
+      "fraud_rate": 0.010769501827952253,
+      "threshold": 0.6
+    },
+    "v1_own_phase4_threshold": 0.6,
+    "note": "V1's own Phase 4 train/validation/test metrics are in reports/model_v1_metrics.csv and are NOT recomputed here; this entry is V1 scored on V2's NEW test split only, for the fair comparison in Section 14."
+  },
+  "comparison": {
+    "v1_on_v2_test_split": {
+      "precision": 0.9918200408997955,
+      "recall": 0.9918200408997955,
+      "f1": 0.9918200408997955,
+      "pr_auc": 0.9981653820636431,
+      "roc_auc": 0.9999269841629729,
+      "accuracy": 0.9998238118310355,
+      "tp": 1940,
+      "tn": 179652,
+      "fp": 16,
+      "fn": 16,
+      "rows": 181624,
+      "fraud_count": 1956,
+      "fraud_rate": 0.010769501827952253,
+      "threshold": 0.6
+    },
+    "v2_on_v2_test_split": {
+      "precision": 0.998467824310521,
+      "recall": 0.9994887525562373,
+      "f1": 0.9989780275932549,
+      "pr_auc": 0.9994901150829729,
+      "roc_auc": 0.9996823412717654,
+      "accuracy": 0.9999779764788794,
+      "tp": 1955,
+      "tn": 179665,
+      "fp": 3,
+      "fn": 1,
+      "rows": 181624,
+      "fraud_count": 1956,
+      "fraud_rate": 0.010769501827952253,
+      "threshold": 0.53
+    },
+    "decision_criteria": {
+      "v2_f1_not_lower_than_v1": true,
+      "v2_pr_auc_not_lower_than_v1": true,
+      "v2_recall_not_lower_than_v1": true
+    },
+    "decision_reasons": [
+      "v2_f1_not_lower_than_v1: PASS",
+      "v2_pr_auc_not_lower_than_v1: PASS",
+      "v2_recall_not_lower_than_v1: PASS"
+    ]
+  },
+  "decision": "V2_CANDIDATE_FOR_DEPLOYMENT",
+  "leakage_checks": {
+    "isFraud not in the 34 features": true,
+    "event_id not in the 34 features": true,
+    "step not in the 34 features (not part of the frozen contract)": true,
+    "No raw identifiers (nameOrig/nameDest) in the split DataFrames": true,
+    "No prediction-output columns used as labels": true,
+    "No train/validation event_id overlap": true,
+    "No train/test event_id overlap": true,
+    "No validation/test event_id overlap": true,
+    "No future information in training (train step range precedes validation/test)": true
+  },
+  "temporal_checks": {
+    "train \u2229 validation event_id = \u2205": true,
+    "train \u2229 test event_id = \u2205": true,
+    "validation \u2229 test event_id = \u2205": true,
+    "temporal ordering: train <= validation <= test (by step)": true,
+    "Phase 10 dataset loaded": true,
+    "34-feature contract (count)": true,
+    "34-feature contract (names + order)": true,
+    "Target 'isFraud' present": true,
+    "Target separated from the 34 features": true,
+    "event_id present (audit-only)": true,
+    "step present (audit-only)": true,
+    "No prediction-output columns (fraud_probability/predicted_label/risk_score/risk_level)": true,
+    "No raw identifier columns (nameOrig/nameDest)": true,
+    "event_id unique": true,
+    "isFraud values only 0/1": true,
+    "No null target values": true
+  },
+  "frozen_artifact_integrity": {
+    "models/xgboost_model_v1.json": true,
+    "models/model_v1_metadata.json": true,
+    "models/model_v1_threshold.json": true,
+    "notebooks/08_drift_detection.ipynb": true,
+    "src/drift/config.py": true,
+    "src/drift/drift_detector.py": true,
+    "reports/drift_report.json": true,
+    "reports/drift_feature_summary.csv": true,
+    "notebooks/09_recent_label_collection.ipynb": true,
+    "src/labels/config.py": true,
+    "src/labels/label_collector.py": true,
+    "reports/recent_label_collection_report.json": true,
+    "notebooks/10_build_v2_retraining_dataset.ipynb": true,
+    "src/retraining/config.py": true,
+    "src/retraining/dataset_builder.py": true,
+    "reports/v2_retraining_dataset_report.json": true,
+    "src/api/app.py": true,
+    "src/streaming/kafka_producer.py": true,
+    "src/streaming/spark_streaming.py": true,
+    "data/processed/recent_labelled_data.parquet": true,
+    "data/processed/v2_retraining_dataset.parquet": true
+  },
+  "reproducibility": {
+    "python_version": "3.12.7",
+    "xgboost_version": "3.4.1",
+    "pandas_version": "2.2.3",
+    "numpy_version": "2.5.3",
+    "scikit_learn_version": "1.9.1",
+    "random_seed": 42
+  },
+  "generated_at_utc": "2026-10-06T15:43:48.163964+00:00"
+}
