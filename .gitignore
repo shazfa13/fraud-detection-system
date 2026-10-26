@@ -15,6 +15,7 @@ __pycache__/
 # Local datasets
 data/raw/
 data/processed/
+data/stage2/*.sqlite3*
 
 # Environment and secret files
 .env

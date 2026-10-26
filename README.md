@@ -1,108 +1,139 @@
-# Fraud Detection System
+# Adaptive Real-Time Financial Transaction Fraud Detection System
 
-Final-year B.Tech CSE project implementing Phases 1-6 of an adaptive financial fraud-detection pipeline.
+An academic transaction-fraud detection prototype built on synthetic PaySim data. It combines a chronological Kafka–Spark prediction pipeline, FastAPI inference, delayed-label tracking, drift monitoring, and guarded offline model lifecycle tools. It is **not a production banking system**: genuine labels are not configured, and retraining is not automatically connected to streaming or monitoring.
 
-## Current implementation
+## Problem and objectives
 
-1. **Phase 1:** PaySim dataset selection and validation
-2. **Phase 2:** Exploratory Data Analysis
-3. **Phase 3:** Past-only feature engineering and leakage audit
-4. **Phase 4:** Chronological XGBoost Model V1 training and evaluation
-5. **Phase 5:** FastAPI deployment of Model V1
-6. **Phase 6:** Live transaction simulation with delayed ground truth
-7. **Phase 7:** Kafka and Spark Structured Streaming validation
-8. **Phase 8:** Drift monitoring only (no retraining or Model V2 deployment)
+Digital transaction streams are imbalanced and time-dependent. A useful prototype must score transactions consistently, prevent target/future-data leakage, preserve a clear audit trail, and avoid retraining or activating a model on unverified outcomes. This project demonstrates those controls with historical and streaming workflows while keeping prediction, monitoring, labels, and candidate management as distinct components.
 
-SHAP, counterfactual explanations, Model V2, automated retraining, and a React dashboard are not implemented yet.
+## Capabilities
 
-## Dataset and generated data
+- FastAPI validates and scores a transaction using a startup-loaded V1 or V2 XGBoost model.
+- Stage 1 publishes PaySim demo events to Kafka; Spark Structured Streaming validates, orders, featurizes, and scores micro-batches.
+- The model receives a strict ordered 34-feature vector. `isFraud` is the target; `event_id` and `step` are audit/order fields, not model inputs.
+- Prediction/error JSONL and stream health are persisted. Stage 1 also registers predictions in the Stage 2 SQLite index.
+- Stage 2 accepts delayed labels with source/authorization checks, immutable first-label behavior, and auditable duplicate/conflict handling.
+- Stage 3 separately records feature drift, eligible-label performance, alerts, and retraining requests; an alert does not launch training.
+- Stage 4 requires genuine verified-label eligibility. Stage 5 evaluates a separate candidate and requires explicit approval for activation, with guarded rollback.
+- Stage 6 demonstrates bounded candidate training on historical synthetic data. Its candidate is marked ineligible for genuine promotion and Stage 5 rejects it.
+- Stage 7 records end-to-end regression and integrity validation. See the [Stage 7 report](reports/stage7_end_to_end_validation_20261025T150813Z.md).
 
-The project uses the PaySim synthetic financial dataset:
+## Technology stack
 
-<https://www.kaggle.com/datasets/ealaxi/paysim1>
+| Technology | Role |
+|---|---|
+| Python 3.12 | Application, data preparation, tests, and workflow tools |
+| Pandas / NumPy / PyArrow | Feature/data preparation and Parquet access; PyArrow is optional in requirements but needed for Parquet workflows |
+| XGBoost | Binary classification over tabular transaction features |
+| FastAPI / Pydantic / Uvicorn | REST endpoints and request validation; Uvicorn is present in the current venv but is not declared in `requirements.txt` |
+| Apache Kafka (`kafka-python`) | Transaction event transport |
+| Apache Spark Structured Streaming | Micro-batch ingestion and inference |
+| SciPy / scikit-learn | Statistical drift tests and evaluation metrics |
+| Streamlit (optional) | Existing local dashboard; installed separately via `requirements-ui.txt` |
 
-Download `PS_20174392719_1491204439457_log.csv` and place it at:
+See [`requirements.txt`](requirements.txt), [`requirements-ui.txt`](requirements-ui.txt), and the [demo runbook](docs/DEMO_RUNBOOK.md) for environment details.
+
+## Architecture and workflow
 
 ```text
-data/raw/PS_20174392719_1491204439457_log.csv
+PaySim demo producer -> Kafka topic -> Spark micro-batches -> event validation
+  -> shared 34-feature builder / process-local AccountState -> active-model resolver
+  -> XGBoost scoring -> prediction JSONL + Stage 2 prediction registry
+
+REST client -> FastAPI /predict -> same feature builder and active model -> response + API log
+
+Delayed label submitter -> Stage 2 API / SQLite <- Stage 1 prediction registry
+Stage 1 feature logs + Stage 2 eligible labels + V1/V2 reference data
+  -> Stage 3 monitor -> persisted alerts and retraining requests
+  -> Stage 4 eligibility gates -> separate candidate -> Stage 5 evaluation
+  -> explicit human approval -> activation manifest; rollback is a separate guarded action
 ```
 
-The raw dataset is excluded from Git. Phase 3 generates `data/processed/featured_transactions.parquet`, which is also excluded from Git and must be regenerated locally when needed.
+The prediction flow and the delayed-label/retraining flow are separate. Monitoring requests are evidence only. The detailed [architecture diagram and lifecycle](docs/PROJECT_WORKFLOW.md) show the implemented connections and their status. The Spark stream uses one Kafka partition because historical account state is process-local. It uses the existing checkpoint; never start concurrent consumers against that checkpoint.
 
-The dataset contains approximately 6.36 million rows, so a machine with at least 8 GB of free RAM is recommended.
+## Features and model versions
 
-## Setup
+The model contract is defined in metadata order and contains these 34 numeric features:
 
-From the repository root on Windows PowerShell:
+`hour_of_day`, `amount`, `log_amount`, `is_large_amount`, `amount_to_sender_balance_ratio`, `amount_ge_sender_balance`, `sender_remaining_if_debited`, `amount_to_dest_balance_ratio`, `sender_balance_before`, `sender_balance_zero_before`, `dest_balance_before`, `dest_balance_zero_before`, `sender_prev_txn_count`, `sender_prev_total_amount`, `sender_prev_mean_amount`, `sender_prev_max_amount`, `dest_prev_txn_count`, `dest_prev_total_amount`, `dest_prev_mean_amount`, `dest_prev_max_amount`, `amount_vs_sender_hist_mean`, `amount_vs_dest_hist_mean`, `sender_hours_since_prev_txn`, `dest_hours_since_prev_txn`, `dest_txn_count_last_1h`, `dest_txn_count_last_24h`, `dest_txn_count_last_168h`, `dest_amount_sum_last_24h`, `dest_amount_sum_last_168h`, `type_CASH_IN`, `type_CASH_OUT`, `type_DEBIT`, `type_PAYMENT`, `type_TRANSFER`.
+
+The feature builder uses pre-transaction balances and past-only sender/destination state. Post-transaction balances are not model inputs. See [`STAGE3_MONITORING.md`](docs/STAGE3_MONITORING.md) and the metadata files for the exact order and provenance.
+
+The active model is **V2**, threshold **0.53**. Without an activation manifest, `FRAUD_ACTIVE_MODEL_VERSION` selects V1 or V2 and defaults to V2. If a valid `models/active_model_manifest.json` exists, it is authoritative. FastAPI and the Spark consumer resolve the model at process startup; restart both to load a changed selection. The current model artifacts are in `models/`; the demonstration candidates under `models/candidates/stage6_demo/` are not active.
+
+## V2 evaluation results
+
+The V2 training report uses `data/processed/v2_retraining_dataset.parquet`: 5,382,204 synthetic PaySim rows (7,649 fraud, 5,374,555 legitimate). Chronological splits were train through step 422 (5,015,193 rows), validation through 565 (185,387 rows), and held-out test through 743 (181,624 rows, 1,956 fraud). Threshold 0.53 was selected on validation data. The values below are the saved **test** results, not live-system performance.
+
+| Model on V2 test split | Threshold | Precision | Recall | F1 | PR-AUC | ROC-AUC | FP / FN |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| V1 | 0.60 | 0.991820 | 0.991820 | 0.991820 | 0.998165 | 0.999927 | 16 / 16 |
+| V2 | 0.53 | 0.998468 | 0.999489 | 0.998978 | 0.999490 | 0.999682 | 3 / 1 |
+
+V2's precision, recall, F1, and PR-AUC are higher on this split; V1's ROC-AUC is slightly higher. The dataset is simulator-generated, so these scores do not establish performance on real financial transactions. More context is in [PROJECT_RESULTS_AND_LIMITATIONS.md](docs/PROJECT_RESULTS_AND_LIMITATIONS.md).
+
+## Labels, monitoring, and model lifecycle
+
+The source dataset is the [PaySim synthetic financial dataset](https://www.kaggle.com/datasets/ealaxi/paysim1). Local producer and preprocessing workflows expect `data/raw/PS_20174392719_1491204439457_log.csv`.
+
+Stage 2 stores predictions and delayed labels in `data/stage2/prediction_labels.sqlite3`. Trusted labels require an explicit source allowlist and a private token; synthetic predictions cannot receive trusted-verified labels. The current documented setup has no genuine source configured and no eligible genuine verified cohort. Stage 4's current minimum is 100 verified labels, including 10 fraud labels, so it blocks genuine candidate creation.
+
+Stage 3 reads prediction feature vectors, a model-specific synthetic reference dataset, and eligible labels; it stores monitoring runs, alerts, and requests in `data/stage3/monitoring.sqlite3`. A historical 31/34 feature-drift alert came from a synthetic comparison window and is not production evidence. Stage 3 never trains or promotes a model.
+
+Stage 5 candidate validation and promotion are separate offline operations. Human approval is bound to a particular candidate and report; activation is not automatic, and rollback is explicit. Stage 6's latest candidate was evaluated on the same 15,000-row synthetic sample as V2. Candidate thresholded precision/recall/F1 were below V2's; the candidate remains marked demonstration-only and was not promoted. See [Stage 4](docs/STAGE4_RETRAINING.md), [Stage 5](docs/STAGE5_MODEL_PROMOTION.md), and [Stage 6](docs/STAGE6_RETRAINING_DEMONSTRATION.md).
+
+## Repository map
+
+```text
+data/                 Raw/processed PaySim files and local Stage 1–3 state
+models/               Frozen V1/V2 artifacts, offline candidates, activation records
+notebooks/            Historical analysis and Phases 2–12
+src/api/              FastAPI, feature builder, AccountState
+src/labels/           Delayed-label API, SQLite store, CLI
+src/monitoring/       Stage 3 monitor, drift/reference sampling, CLI
+src/retraining/       Active resolver, eligibility, candidate evaluation/activation
+src/streaming/        Kafka producers and Spark consumers
+reports/              Evaluation, integration, monitoring, and validation records
+docs/                 Stage guides, workflow, results, demo runbook, presentation
+tests/                unittest coverage for streaming and lifecycle stages
+```
+
+The repo's `tools/kafka.tgz` is an archive, not an installed broker. The local Kafka installation and broker configuration are machine-specific. The active service paths and safe startup order are in [`DEMO_RUNBOOK.md`](docs/DEMO_RUNBOOK.md); it also explains which commands write persistent state.
+
+## Setup and run
+
+Use Python 3.12 and PowerShell from the repository root. A fresh environment can be prepared with:
 
 ```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1
+python -m venv venv
+.\venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 python -m pip install pyarrow
 ```
 
-The repository pins `pandas==2.2.3` because PySpark 4.2.0 still warns on pandas 3.x. The Spark Kafka connector is configured for the installed Spark 4.2.0 / Scala 2.13 runtime via the `spark.jars.packages` setting in `src/streaming/spark_streaming.py`.
+The current project environment has Uvicorn, although `requirements.txt` does not declare it. Check `python -m uvicorn --version` before starting the API in a new environment. Optional dashboard dependencies are in `requirements-ui.txt`.
 
-The repository's existing local environment may also be used if it already contains the declared dependencies.
+Start FastAPI with V2 (the default) using `python -m uvicorn src.api.app:app --host 127.0.0.1 --port 8000`; check `/health` and `/docs`. For the current streaming path, start the configured Kafka broker, then one consumer with `python -m src.streaming.stage1_streaming`, then optionally the continuous synthetic producer with `python -m src.streaming.stage1_producer --delay 2`. The producer loops indefinitely and publishes synthetic PaySim events. Those commands append to existing topic/log/checkpoint/database state; see the [runbook](docs/DEMO_RUNBOOK.md) before starting them. Phase 14 did not run services.
 
-## Notebook execution order
-
-Run the notebooks from the repository root in this order:
-
-1. `02_exploratory_data_analysis.ipynb`
-2. `03_feature_engineering.ipynb`
-3. `04_xgboost_model_v1.ipynb`
-4. `05_model_deployment.ipynb`
-5. Start FastAPI.
-6. `06_live_transaction_simulation.ipynb`
-
-Phase 4 uses a chronological train/validation/test split and selects the classification threshold on validation data. Do not retrain Model V1 as part of Phase 5 or Phase 6.
-
-## Run FastAPI
-
-From the repository root:
+Run the tests from the project venv:
 
 ```powershell
-python -m uvicorn src.api.app:app --reload
+.\venv\Scripts\python.exe -m unittest discover -s tests -p "test_stage*.py" -v
+.\venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
 
-The service is available at:
+Phase 13 recorded 57 passing Stage 1–6 tests and 107 passing tests overall. The venv does not include `pytest`; it was not installed. The tests establish the exercised code paths and guard behavior, not production readiness or live broker reliability.
 
-- <http://127.0.0.1:8000/health>
-- <http://127.0.0.1:8000/docs>
+## Reports and detailed guides
 
-The Phase 5 API loads Model V1 once and maintains development-only process-local account history.
+- [System workflow and Mermaid architecture](docs/PROJECT_WORKFLOW.md)
+- [Evaluation results and limitations](docs/PROJECT_RESULTS_AND_LIMITATIONS.md)
+- [Demo runbook](docs/DEMO_RUNBOOK.md)
+- [12-slide outline and viva questions](docs/PROJECT_PRESENTATION.md)
+- [Stage 1 streaming](docs/STAGE1_STREAMING.md) · [Stage 2 labels](docs/STAGE2_LABELS.md) · [Stage 3 monitoring](docs/STAGE3_MONITORING.md)
+- [Stage 4 eligibility](docs/STAGE4_RETRAINING.md) · [Stage 5 promotion/rollback](docs/STAGE5_MODEL_PROMOTION.md) · [Stage 6 demonstration](docs/STAGE6_RETRAINING_DEMONSTRATION.md) · [Stage 7 validation](docs/STAGE7_END_TO_END_VALIDATION.md)
+- [V2 training report](reports/model_v2_training_report.json) · [V1/V2 comparison](reports/model_v1_vs_v2_comparison.json) · [V2 deployment report](reports/model_v2_deployment_report.json) · [dataset report](reports/v2_retraining_dataset_report.json) · [drift report](reports/drift_report.json) · [Stage 7 report](reports/stage7_end_to_end_validation_20261025T150813Z.json)
 
-## Phase 6 historical warm-up
+## Limitations and future work
 
-Before the selected live evaluation window, Phase 6 resets the development API state and replays only the chronological prefix needed for accounts present in the live window. Warm-up transactions reconstruct prediction-time account state; they are not counted as live predictions and their labels are never sent to the API.
-
-The live request excludes `isFraud`. Ground truth is stored separately and becomes available using a logical delay timestamp.
-
-## Phase 8 drift monitoring
-
-Run `notebooks/08_drift_detection.ipynb` after the Phase 3-7 artifacts are available. The monitor compares
-the Model V1 training window (steps 1-323) with the later test/live window (step 379 onward); validation
-steps 324-378 are deliberately excluded. It uses reference-decile PSI plus a two-sample KS test for
-continuous features and a two-proportion z-test for binary features, with Benjamini-Hochberg correction.
-A feature is drifted when PSI is at least 0.20 or its adjusted test p-value is below 0.05; overall drift
-is reported when at least 15% of tested features drift. `isFraud` and other ground truth are excluded.
-
-The notebook prefers `data/processed/featured_transactions.parquet`. If it is unavailable, it reconstructs
-features by replaying the complete raw transaction stream through the existing Phase 3/5 feature pipeline,
-without resetting account state at the window boundary. Raw and processed data are checked for the expected
-full PaySim row count. Sample or synthetic inputs are explicitly marked `SAMPLE_OR_SYNTHETIC` and
-`NON-FINAL DATASET RUN`; they must not be presented as the official full-data result. The controlled
-synthetic drift demonstration is separate from the production monitoring decision. Phase 8 stops after
-reporting drift and does not retrain or create Model V2.
-
-## Evaluation interpretation
-
-Phase 4's full chronological test-set metrics are the primary Model V1 performance evidence.
-
-Phase 6 retains a selected 100-transaction fraud-containing demonstration so the delayed-label workflow can be shown with both classes. Its metrics describe that selected live demonstration and should not be interpreted as an unbiased estimate of overall Model V1 generalization.
-
-## Outputs
-
-Reports are written under `reports/`, including feature metadata, Model V1 metrics, test predictions, live prediction logs, delayed ground truth, merged evaluation data, and Phase 6 figures. The raw dataset and processed parquet remain local-only artifacts.
+PaySim is synthetic. Genuine investigation/chargeback labels and a verified source are not available in the current setup. Stage 3's statistical limits and Stage 4's eligibility minima need calibration with a real, authorized, sufficiently large cohort. Account history is process-local, and the single-partition design limits scaling. The live Stage 1 producer repeats a finite historical slice, and streaming append/checkpoint behavior is at-least-once. Phase 13 did not repeat live Kafka/Spark or a persistent monitoring run. The lifecycle tools are guarded and offline, not an automated adaptive retraining service. Future work begins with authorized real-label integration, representative evaluation, operational policy review, distributed state design, and controlled live validation.

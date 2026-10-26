@@ -1,0 +1,2 @@
+# Optional presentation dashboard dependency; backend requirements remain unchanged.
+streamlit>=1.38,<2
