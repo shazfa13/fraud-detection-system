@@ -1,0 +1,7 @@
+INFO:fraud_api:Model V2 loaded. 34 expected features. Classification threshold=0.53
+INFO:     Started server process [11112]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8767 (Press CTRL+C to quit)
+INFO:     127.0.0.1:64351 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64354 - "POST /predict HTTP/1.1" 200 OK

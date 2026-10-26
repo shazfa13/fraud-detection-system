@@ -60,3 +60,10 @@ SIMULATION_DELAY = 0.5      # seconds between published transactions (mirrors Ph
 NUM_TRANSACTIONS = 20        # Phase 7's minimum required validation size; raise freely
 
 MODEL_VERSION_EXPECTED = "V1"
+
+# ---- Stage 1 continuous streaming outputs (kept separate from Phase 7/12 evidence) ------------
+STAGE1_DIR = PROJECT_ROOT / "data" / "stage1_streaming"
+STAGE1_OUTPUT_PATH = STAGE1_DIR / "predictions.jsonl"
+STAGE1_ERROR_PATH = STAGE1_DIR / "errors.jsonl"
+STAGE1_STATUS_PATH = STAGE1_DIR / "stream_status.json"
+STAGE1_CHECKPOINT_PATH = PROJECT_ROOT / "checkpoints" / "stage1_kafka_spark"

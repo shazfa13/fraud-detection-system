@@ -70,6 +70,11 @@
   "scale_pos_weight": 1192.8093311116402,
   "selected_classification_threshold": 0.53,
   "threshold_selection_reason": "maximum F1 on the validation split only",
+  "risk_level_definitions": {
+    "LOW":    [0,  30],
+    "MEDIUM": [30, 70],
+    "HIGH":   [70, 100]
+  },
   "evaluation_metrics": {
     "train": {
       "precision": 0.9392712550607287,

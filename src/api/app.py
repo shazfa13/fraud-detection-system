@@ -3,8 +3,8 @@ Financial Fraud Detection API — Model V2 (with V1 rollback)
 =========================================
 
 The feature pipeline remains the frozen Phase 5 implementation. The active model is selected
-at process startup with FRAUD_ACTIVE_MODEL_VERSION=v1 or v2 (default: v2); restart the process
-after changing it. Model artifacts are never modified by this module.
+at process startup from the shared Stage 5 activation manifest. With no manifest,
+FRAUD_ACTIVE_MODEL_VERSION=v1 or v2 is honored (default: v2). Restart after changes.
 
 Pipeline implemented here:
 
@@ -39,6 +39,7 @@ import pandas as pd
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field, field_validator
 from xgboost import XGBClassifier
+from src.retraining.active_model import resolve_active_model
 
 logger = logging.getLogger("fraud_api")
 logging.basicConfig(level=logging.INFO)
@@ -48,25 +49,11 @@ logging.basicConfig(level=logging.INFO)
 # working directory it is started from (src/api/app.py -> parents[2] is the project root).
 # ---------------------------------------------------------------------------------------------
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-ACTIVE_MODEL_VERSION = os.environ.get("FRAUD_ACTIVE_MODEL_VERSION", "v2").strip().lower()
-if ACTIVE_MODEL_VERSION not in {"v1", "v2"}:
-    raise ValueError("FRAUD_ACTIVE_MODEL_VERSION must be exactly 'v1' or 'v2'.")
-
-_MODEL_CONFIG = {
-    "v1": {
-        "model": PROJECT_ROOT / "models" / "xgboost_model_v1.json",
-        "metadata": PROJECT_ROOT / "models" / "model_v1_metadata.json",
-        "threshold": PROJECT_ROOT / "models" / "model_v1_threshold.json",
-    },
-    "v2": {
-        "model": PROJECT_ROOT / "models" / "xgboost_model_v2.json",
-        "metadata": PROJECT_ROOT / "models" / "model_v2_metadata.json",
-        "threshold": PROJECT_ROOT / "models" / "model_v2_threshold.json",
-    },
-}
-MODEL_PATH = _MODEL_CONFIG[ACTIVE_MODEL_VERSION]["model"]
-METADATA_PATH = _MODEL_CONFIG[ACTIVE_MODEL_VERSION]["metadata"]
-THRESHOLD_PATH = _MODEL_CONFIG[ACTIVE_MODEL_VERSION]["threshold"]
+ACTIVE_MODEL_BUNDLE = resolve_active_model(project_root=PROJECT_ROOT)
+ACTIVE_MODEL_VERSION = ACTIVE_MODEL_BUNDLE.model_version.lower()
+MODEL_PATH = ACTIVE_MODEL_BUNDLE.model_path
+METADATA_PATH = ACTIVE_MODEL_BUNDLE.metadata_path
+THRESHOLD_PATH = ACTIVE_MODEL_BUNDLE.threshold_path
 FE_SUMMARY_PATH = PROJECT_ROOT / "reports" / "feature_engineering_summary.json"
 LOG_PATH = Path(os.environ.get(
     "FRAUD_PREDICTION_LOG_PATH",
@@ -110,8 +97,8 @@ MAX_WINDOW = max(WINDOWS)
 LARGE_AMOUNT_THRESHOLD = FE_PARAMS["large_amount_threshold"]
 RETAIN_FLAG_FEATURE = bool(FE_PARAMS.get("retain_flag_feature", False))
 
-if MODEL_VERSION.lower() != ACTIVE_MODEL_VERSION:
-    raise ValueError(f"Metadata version {MODEL_VERSION!r} does not match active version {ACTIVE_MODEL_VERSION!r}.")
+if MODEL_VERSION != ACTIVE_MODEL_BUNDLE.model_version:
+    raise ValueError(f"Metadata version {MODEL_VERSION!r} does not match resolved active version {ACTIVE_MODEL_BUNDLE.model_version!r}.")
 if len(FINAL_FEATURES) != 34 or len(set(FINAL_FEATURES)) != len(FINAL_FEATURES):
     raise ValueError("The active model metadata must define exactly 34 unique features.")
 if METADATA.get("feature_count") != len(FINAL_FEATURES):

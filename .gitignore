@@ -38,3 +38,7 @@ dist/
 .pytest_cache/
 .coverage
 htmlcov/
+
+# Generated runtime artifacts
+checkpoints/
+models/candidates/

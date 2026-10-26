@@ -62,7 +62,7 @@ def resolve_test_period(raw_df: pd.DataFrame, metadata_path: Path) -> tuple[pd.D
 
 def load_transaction_stream(num_transactions: int, raw_data_path: Path = config.RAW_DATA_PATH,
                             metadata_path: Path = config.METADATA_PATH) -> pd.DataFrame:
-    """The first `num_transactions` rows of the test period, in chronological order (no shuffling)."""
+    """The first test-period rows for the supplied model metadata, in chronological order."""
     if not raw_data_path.is_file():
         raise FileNotFoundError(f"Raw PaySim CSV not found at {raw_data_path}. Phase 1 data must be present locally "
                                 "(it is intentionally git-ignored - see .gitignore).")

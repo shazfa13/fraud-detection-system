@@ -1,0 +1,66 @@
+{
+  "phase": 12,
+  "status": "PASS",
+  "completed_at_utc": "2026-10-19T08:00:00.632335+00:00",
+  "model_version": "V2",
+  "threshold": 0.53,
+  "topic": "phase12-v2-integration-20261019075835",
+  "producer_transport": "kafka",
+  "messages_sent": 1,
+  "partition": 0,
+  "offset": 0,
+  "prediction_rows": 1,
+  "prediction": {
+    "transaction_id": "PHASE12-20261019075835",
+    "step": 379,
+    "type": "PAYMENT",
+    "amount": 4349.85,
+    "fraud_probability": 0.4292927980422973,
+    "predicted_label": 0,
+    "risk_score": 42.9293,
+    "risk_level": "MEDIUM",
+    "model_version": "V2",
+    "prediction_timestamp": "2026-10-19T07:59:59.489286+00:00"
+  },
+  "checks": {
+    "kafka_publish": {
+      "status": "PASS",
+      "topic": "phase12-v2-integration-20261019075835",
+      "partition": 0,
+      "offset": 0
+    },
+    "prediction": {
+      "status": "PASS",
+      "model_version": "V2",
+      "transaction_id": "PHASE12-20261019075835",
+      "fraud_probability": 0.4292927980422973
+    },
+    "threshold": {
+      "status": "PASS",
+      "threshold": 0.53,
+      "predicted_label": 0,
+      "expected_label": 0
+    },
+    "risk_level": {
+      "status": "PASS",
+      "risk_score": 42.9293,
+      "risk_level": "MEDIUM",
+      "expected_risk_level": "MEDIUM"
+    },
+    "checkpoint": {
+      "status": "PASS",
+      "path": "D:\\fraud-detection-system\\fraud-detection-system\\checkpoints\\phase12_v2_20261019075835\\kafka"
+    },
+    "feature_contract": {
+      "status": "PASS",
+      "feature_count": 34
+    },
+    "output": {
+      "status": "PASS",
+      "path": "D:\\fraud-detection-system\\fraud-detection-system\\reports\\phase12_v2_predictions_20261019075835.csv",
+      "rows": 1
+    }
+  },
+  "result_file": "reports\\phase12_v2_predictions_20261019075835.csv",
+  "checkpoint_path": "checkpoints\\phase12_v2_20261019075835\\kafka"
+}

@@ -13,6 +13,7 @@ parents[2] is the project root), matching the other src/*/config.py modules.
 from __future__ import annotations
 
 from pathlib import Path
+import os
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
@@ -60,3 +61,18 @@ GROUND_TRUTH_SOURCE = "raw PaySim dataset (data/raw/*.csv), column 'isFraud' - S
                       "recent window Phase 8's drift decision concerns). This is NOT real production " \
                       "label collection (no real investigations/chargebacks are involved)."
 TIMELINE_BIN_COUNT = 40   # number of step-bins for the fraud-rate-over-time figure
+
+# ---- Stage 2 delayed labels (separate from the Phase 9 simulated PaySim collector) ------------
+STAGE2_DB_PATH = PROJECT_ROOT / "data" / "stage2" / "prediction_labels.sqlite3"
+
+
+def trusted_label_sources() -> set[str]:
+    """Explicit allowlist for verified outcomes; empty means no genuine source is configured."""
+    return {source.strip() for source in os.environ.get("FRAUD_TRUSTED_LABEL_SOURCES", "").split(",")
+            if source.strip()}
+
+
+def trusted_label_token() -> str | None:
+    """Shared local API credential required before a trusted-source claim is accepted."""
+    value = os.environ.get("FRAUD_TRUSTED_LABEL_TOKEN", "").strip()
+    return value if len(value) >= 32 else None

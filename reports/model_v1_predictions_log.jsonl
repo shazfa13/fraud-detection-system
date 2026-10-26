@@ -250,3 +250,8 @@
 {"timestamp_utc": "2026-09-26T15:55:17.711918+00:00", "model_version": "V1", "fraud_probability": 0.6314648389816284, "predicted_label": 1, "risk_score": 63.1465, "risk_level": "MEDIUM"}
 {"timestamp_utc": "2026-09-26T15:55:17.861293+00:00", "model_version": "V1", "fraud_probability": 0.6314648389816284, "predicted_label": 1, "risk_score": 63.1465, "risk_level": "MEDIUM"}
 {"timestamp_utc": "2026-09-26T15:55:17.992328+00:00", "model_version": "V1", "fraud_probability": 0.6315896511077881, "predicted_label": 1, "risk_score": 63.159, "risk_level": "MEDIUM"}
+{"timestamp_utc": "2026-10-17T10:54:32.297780+00:00", "model_version": "V1", "fraud_probability": 0.36919987201690674, "predicted_label": 0, "risk_score": 36.92, "risk_level": "MEDIUM"}
+{"timestamp_utc": "2026-10-17T12:27:33.902109+00:00", "model_version": "V1", "fraud_probability": 0.36919987201690674, "predicted_label": 0, "risk_score": 36.92, "risk_level": "MEDIUM"}
+{"timestamp_utc": "2026-10-17T13:18:26.554713+00:00", "model_version": "V1", "fraud_probability": 0.36919987201690674, "predicted_label": 0, "risk_score": 36.92, "risk_level": "MEDIUM"}
+{"timestamp_utc": "2026-10-17T13:24:41.191925+00:00", "model_version": "V1", "fraud_probability": 0.36919987201690674, "predicted_label": 0, "risk_score": 36.92, "risk_level": "MEDIUM"}
+{"timestamp_utc": "2026-10-17T14:39:12.733584+00:00", "model_version": "V1", "fraud_probability": 0.36919987201690674, "predicted_label": 0, "risk_score": 36.92, "risk_level": "MEDIUM"}

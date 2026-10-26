@@ -1,0 +1,2 @@
+transaction_id,step,type,amount,fraud_probability,predicted_label,risk_score,risk_level,model_version,prediction_timestamp
+PHASE12-20261017143931,379,PAYMENT,4349.85,0.42929279804229736,0,42.9293,MEDIUM,V2,2026-10-17T14:40:22.845414+00:00

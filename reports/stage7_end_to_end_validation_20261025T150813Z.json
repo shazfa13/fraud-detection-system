@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "stage": "Stage 7",
+  "check_id": "stage7-end-to-end-validation-20261025T150813Z",
+  "validation_timestamp_utc": "2026-10-25T15:08:13Z",
+  "roadmap_scope": "README Phase 13: Final Testing, Bug Fixes, and Project Stability",
+  "overall_status": "pass_with_limitations",
+  "checks": [
+    {
+      "id": "stage1_to_stage6_focused_tests",
+      "status": "pass",
+      "command": ".\\venv\\Scripts\\python.exe -m unittest discover -s tests -p \"test_stage*.py\" -v",
+      "tests_run": 57,
+      "failures": 0,
+      "errors": 0,
+      "details": "Stage 1–6 focused suite passed; tests use temporary fixtures for writable state."
+    },
+    {
+      "id": "full_test_suite",
+      "status": "pass",
+      "command": ".\\venv\\Scripts\\python.exe -m unittest discover -s tests -v",
+      "tests_run": 107,
+      "failures": 0,
+      "errors": 0,
+      "details": "Full unittest discovery passed. Expected mocked Stage 1 database-lock logging and a Starlette/httpx deprecation warning appeared."
+    },
+    {
+      "id": "pytest_runner_availability",
+      "status": "blocked",
+      "command": ".\\venv\\Scripts\\python.exe -m pytest",
+      "details": "The project venv reports No module named pytest; no package was installed. The full unittest suite was run successfully instead."
+    },
+    {
+      "id": "active_model_and_feature_contract",
+      "status": "pass",
+      "component": "src/retraining/active_model.py",
+      "details": "Shared resolver selected V2 at threshold 0.53; metadata contract has 34 ordered distinct features; event_id, step, and isFraud are excluded; no promotion manifest exists."
+    },
+    {
+      "id": "serving_and_streaming_contract",
+      "status": "pass",
+      "components": ["src/api/app.py", "src/streaming/stage1_streaming.py"],
+      "details": "Automated Stage 1 temporary-batch inference and Stage 5 shared-resolver tests passed, including /health model/threshold assertions and rejection of isFraud as request input. No live HTTP, Kafka, or Spark process was started."
+    },
+    {
+      "id": "label_monitoring_and_retraining_gates",
+      "status": "pass",
+      "components": ["src/labels", "src/monitoring", "src/retraining/stage4_workflow.py"],
+      "details": "Automated tests passed for synthetic label exclusion, conflict auditing, synthetic-only drift not requesting retraining, request deduplication, and insufficient eligible labels blocking candidate creation. Monitoring tests used temporary databases."
+    },
+    {
+      "id": "promotion_and_rollback_guards",
+      "status": "pass",
+      "component": "src/retraining/stage5_workflow.py",
+      "details": "Temporary-artifact tests passed for authorization binding, fail-closed malformed/hash-mismatched manifest handling, dry-run, activation, rollback, stale approval rejection, and demonstration candidate rejection."
+    },
+    {
+      "id": "active_bundle_failure_safety",
+      "status": "pass",
+      "component": "src/retraining/active_model.py",
+      "details": "Using only a temporary copy of the artifacts, the resolver rejected a missing V2 model, malformed model JSON, and malformed activation manifest. A direct health check returned V2/0.53 and TransactionRequest rejected isFraud."
+    },
+    {
+      "id": "stage6_isolated_demonstration",
+      "status": "pass",
+      "component": "src/retraining/stage6_demo.py",
+      "details": "Unit tests trained toy demonstration candidates only in temporary directories and verified they remain ineligible for promotion. Existing Stage 6 candidate directories were inspected read-only and remain marked candidate_trained_not_promoted."
+    },
+    {
+      "id": "persistent_state_and_artifact_integrity",
+      "status": "pass",
+      "details": "Pre/post SHA-256 snapshots matched for 495 local files: Stage 2/3 SQLite, WAL/SHM, checkpoints, V1/V2 artifacts, and prediction JSONL. Existing Phase 12 artifact hash baseline also matches the current V1/V2 model, metadata, and threshold files."
+    },
+    {
+      "id": "persistent_monitor_and_live_streaming",
+      "status": "not_run",
+      "details": "The persistent Stage 3 monitor, live API, Kafka broker, Spark consumer, and producer were not executed to avoid modifying persistent or external service state."
+    },
+    {
+      "id": "python_syntax",
+      "status": "pass",
+      "command": "UTF-8 BOM-aware ast.parse over src/**/*.py and tests/**/*.py",
+      "files_checked": 50,
+      "details": "All 50 Python files parsed successfully; no application Python files were changed."
+    },
+    {
+      "id": "code_changes_and_python_compilation",
+      "status": "not_applicable",
+      "details": "No application Python files were changed; syntax was checked without writing pyc files. This Stage 7 change adds documentation and reports only."
+    },
+    {
+      "id": "git_diff_check",
+      "status": "pass",
+      "command": "git diff --check",
+      "details": "Executed successfully with no whitespace errors; Git printed pre-existing line-ending conversion warnings for modified files."
+    }
+  ],
+  "active_model": {
+    "version": "V2",
+    "threshold": 0.53,
+    "feature_count": 34,
+    "promotion_manifest_present": false,
+    "artifact_sha256": {
+      "model.json": "0e2ea322d0f16d918cd42e27bbd98af485e9b03b8ef0142b5067e43cbf4ab89e",
+      "metadata.json": "614ec7955de0a24475628c9aef98f97af2d227674c16895bff186011d553b92e",
+      "threshold.json": "3b181a9d06d878e646db99432465b355d58fd4f649d30215d7b58d6d537e3f80"
+    }
+  },
+  "model_training": {
+    "operational_model_trained": false,
+    "isolated_temporary_demo_candidate_trained_by_unit_test": true,
+    "model_promoted": false
+  },
+  "persistent_state": {
+    "snapshot_method": "SHA-256 and file-size comparison immediately before and after test runs",
+    "files_compared": 495,
+    "changed_files": [],
+    "resources": [
+      "data/stage2 SQLite database and WAL/SHM files",
+      "data/stage3 monitoring SQLite database",
+      "existing checkpoints/**",
+      "V1/V2 model JSON, metadata, and threshold files",
+      "reports/model_v1_predictions_log.jsonl",
+      "reports/model_v2_predictions_log.jsonl"
+    ],
+    "external_kafka_or_running_service_state_inspected": false
+  },
+  "limitations": [
+    "The project venv does not include pytest; unittest discovery passed all repository tests.",
+    "No live API, Kafka, or Spark integration was repeated in this validation.",
+    "Synthetic PaySim outcomes and the Stage 6 demonstration candidate are not real-world evidence."
+  ],
+  "no_commit_or_push": true
+}

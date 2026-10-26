@@ -1,0 +1,11 @@
+{
+  "selected_threshold": 0.53,
+  "selection_method": "maximum F1 on the validation split only",
+  "validation_metrics_at_threshold": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0
+  },
+  "threshold_grid_step": 0.01,
+  "saved_at_utc": "2026-10-06T15:43:28.718983+00:00"
+}

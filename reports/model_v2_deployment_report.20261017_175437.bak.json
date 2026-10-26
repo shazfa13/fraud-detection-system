@@ -1,0 +1,360 @@
+{
+  "phase": 12,
+  "final_status": "V2_DEPLOYMENT_BLOCKED",
+  "started_at_utc": "2026-10-17T10:54:10.890182+00:00",
+  "completed_at_utc": "2026-10-17T10:54:38.072396+00:00",
+  "phase11_decision": "V2_CANDIDATE_FOR_DEPLOYMENT",
+  "direct_v1_probability": 0.36919987201690674,
+  "direct_v2_probability": 0.4292810261249542,
+  "api_v2_probability": 0.4292810261249542,
+  "v2_restoration_validation": "PASS",
+  "tests": [
+    {
+      "test_name": "artifact_presence_and_json",
+      "status": "PASS",
+      "expected": "All frozen artifacts and Phase 11 reports exist and parse as JSON",
+      "actual": {
+        "missing": [],
+        "parsed": 8
+      },
+      "details": "Read-only artifact and JSON validation."
+    },
+    {
+      "test_name": "phase11_decision",
+      "status": "PASS",
+      "expected": "V2_CANDIDATE_FOR_DEPLOYMENT",
+      "actual": "V2_CANDIDATE_FOR_DEPLOYMENT",
+      "details": "Stored Phase 11 deployment decision."
+    },
+    {
+      "test_name": "feature_contract",
+      "status": "PASS",
+      "expected": {
+        "count": 34,
+        "same_order": true
+      },
+      "actual": {
+        "v1_count": 34,
+        "v2_count": 34,
+        "same_order": true
+      },
+      "details": "Exact ordered contract from both frozen metadata artifacts."
+    },
+    {
+      "test_name": "v2_threshold_contract",
+      "status": "PASS",
+      "expected": "V2 threshold matches metadata and is in [0, 1]",
+      "actual": 0.53,
+      "details": "V2 threshold artifact validation."
+    },
+    {
+      "test_name": "model_artifact_loading",
+      "status": "PASS",
+      "expected": "Both frozen XGBClassifier artifacts load",
+      "actual": {
+        "v1_loaded": true,
+        "v2_loaded": true
+      },
+      "details": "No training or artifact writes performed."
+    },
+    {
+      "test_name": "model_feature_contract",
+      "status": "PASS",
+      "expected": "Loaded models expose the metadata feature order",
+      "actual": true,
+      "details": "Booster feature names cross-checked with metadata."
+    },
+    {
+      "test_name": "direct_v1_v2_compatibility",
+      "status": "PASS",
+      "expected": "Both models accept the same exact 34-feature input",
+      "actual": {
+        "feature_count": 34,
+        "v1_probability": 0.36919987201690674,
+        "v2_probability": 0.4292810261249542,
+        "columns_match": true
+      },
+      "details": "Direct inference uses a non-consuming preview so API history remains comparable."
+    },
+    {
+      "test_name": "api_health_v2",
+      "status": "PASS",
+      "expected": {
+        "model_version": "V2",
+        "feature_count": 34,
+        "threshold": 0.53
+      },
+      "actual": {
+        "status": "healthy",
+        "model_loaded": true,
+        "model_version": "V2",
+        "feature_count": 34,
+        "threshold": 0.53
+      },
+      "details": "Fresh V2 process health response."
+    },
+    {
+      "test_name": "api_v2_prediction_parity",
+      "status": "PASS",
+      "expected": {
+        "http_status": 200,
+        "tolerance": 1e-06,
+        "deterministic_after_state_reset": true
+      },
+      "actual": {
+        "status": 200,
+        "repeat_status": 200,
+        "direct_probability": 0.4292810261249542,
+        "first_probability": 0.4292810261249542,
+        "repeat_probability": 0.4292810261249542,
+        "direct_difference": 0.0,
+        "repeat_difference": 0.0
+      },
+      "details": "Same payload compared with reset API state between deterministic samples."
+    },
+    {
+      "test_name": "ground_truth_rejection",
+      "status": "PASS",
+      "expected": 422,
+      "actual": {
+        "status": 422,
+        "body": {
+          "detail": [
+            {
+              "type": "extra_forbidden",
+              "loc": [
+                "body",
+                "isFraud"
+              ],
+              "msg": "Extra inputs are not permitted",
+              "input": 0
+            }
+          ]
+        }
+      },
+      "details": "Ground-truth fields must be rejected."
+    },
+    {
+      "test_name": "request_validation",
+      "status": "PASS",
+      "expected": 422,
+      "actual": {
+        "status": 422,
+        "body": {
+          "detail": [
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "amount"
+              ],
+              "msg": "Field required",
+              "input": {
+                "step": 500,
+                "type": "TRANSFER",
+                "nameOrig": "C1234567890",
+                "oldbalanceOrg": 5000.0,
+                "nameDest": "C9876543210",
+                "oldbalanceDest": 0.0,
+                "isFlaggedFraud": 0
+              }
+            }
+          ]
+        }
+      },
+      "details": "Missing required fields must be rejected."
+    },
+    {
+      "test_name": "api_performance",
+      "status": "PASS",
+      "expected": {
+        "successful_requests": 5,
+        "failed_requests": 0
+      },
+      "actual": {
+        "total_requests": 5,
+        "successful_requests": 5,
+        "failed_requests": 0,
+        "median_latency_ms": 12.83270000203629,
+        "minimum_latency_ms": 11.463999999250518,
+        "maximum_latency_ms": 16.729700000723824,
+        "method": "Sequential POST requests; startup excluded",
+        "status": "PASS"
+      },
+      "details": "Measured successful HTTP prediction requests."
+    },
+    {
+      "test_name": "fresh_process_parity",
+      "status": "PASS",
+      "expected": {
+        "status": 200,
+        "tolerance": 1e-06
+      },
+      "actual": {
+        "status": 200,
+        "difference": 0.0
+      },
+      "details": "Independent V2 process parity."
+    },
+    {
+      "test_name": "restart_rollback_v1",
+      "status": "PASS",
+      "expected": {
+        "model_version": "V1",
+        "status": 200
+      },
+      "actual": {
+        "health": {
+          "status": "healthy",
+          "model_loaded": true,
+          "model_version": "V1",
+          "feature_count": 34,
+          "threshold": 0.6
+        },
+        "status": 200,
+        "prediction": {
+          "prediction": 0,
+          "fraud_probability": 0.36919987201690674,
+          "risk_score": 36.92,
+          "risk_level": "MEDIUM",
+          "model_version": "V1"
+        }
+      },
+      "details": "Restart-based V1 rollback."
+    },
+    {
+      "test_name": "restore_v2",
+      "status": "PASS",
+      "expected": {
+        "model_version": "V2",
+        "status": 200
+      },
+      "actual": {
+        "health": {
+          "status": "healthy",
+          "model_loaded": true,
+          "model_version": "V2",
+          "feature_count": 34,
+          "threshold": 0.53
+        },
+        "status": 200,
+        "prediction": {
+          "prediction": 0,
+          "fraud_probability": 0.4292810261249542,
+          "risk_score": 42.9281,
+          "risk_level": "MEDIUM",
+          "model_version": "V2"
+        }
+      },
+      "details": "Fresh-process V2 restoration."
+    },
+    {
+      "test_name": "kafka_schema_compatibility",
+      "status": "PASS",
+      "expected": "Ten transaction-time fields without isFraud",
+      "actual": [
+        "transaction_id",
+        "step",
+        "type",
+        "amount",
+        "nameOrig",
+        "oldbalanceOrg",
+        "newbalanceOrig",
+        "nameDest",
+        "oldbalanceDest",
+        "newbalanceDest"
+      ],
+      "details": "Validated the producer's actual published field list; newbalance fields are compatibility-only."
+    },
+    {
+      "test_name": "spark_feature_contract_compatibility",
+      "status": "PASS",
+      "expected": "Spark references the frozen feature contract and label handling",
+      "actual": {
+        "source_exists": true,
+        "contract_markers": true
+      },
+      "details": "Offline source compatibility check."
+    },
+    {
+      "test_name": "kafka_spark_end_to_end",
+      "status": "PASS",
+      "expected": "A real broker-backed Kafka-to-Spark integration completes",
+      "actual": {
+        "executed": true,
+        "model_version": "V1",
+        "topic": "fraud-transactions-phase12-test",
+        "producer_transport": "kafka",
+        "messages_sent": 1,
+        "partition": 0,
+        "offset": 0,
+        "prediction_rows": 1,
+        "prediction_model_version": "V1",
+        "checkpoint_created": true,
+        "result_file": "reports/phase12_kafka_test_predictions.csv",
+        "checkpoint_path": "checkpoints/phase12_kafka_test/kafka"
+      },
+      "details": "PASS: Real broker-backed Kafka-to-Spark integration verified with one message on the isolated Phase 12 test topic (partition 0, offset 0). Spark explicitly ran in kafka mode and produced one V1 prediction row; checkpoint offset/commit records were present. This validates the V1 streaming path only, not V2 deployment or promotion."
+    },
+    {
+      "test_name": "artifact_integrity",
+      "status": "PASS",
+      "expected": "Frozen model, metadata, threshold, and Phase 11 report hashes unchanged",
+      "actual": {
+        "unchanged": true,
+        "before": {
+          "v1_model": "7c72da959fd9d98411b758f65f3b1ea1b43fbec1a854facea064a5f1ec0c7488",
+          "v1_metadata": "c32705e031e93b5766a8b10fce24023bd5240a800b1238cf97f13797ad0428c4",
+          "v1_threshold": "16317aa3c4944669c631b864df030aa6cd8b09e292a29d9dfd4d040c503067a6",
+          "v2_model": "0e2ea322d0f16d918cd42e27bbd98af485e9b03b8ef0142b5067e43cbf4ab89e",
+          "v2_metadata": "614ec7955de0a24475628c9aef98f97af2d227674c16895bff186011d553b92e",
+          "v2_threshold": "3b181a9d06d878e646db99432465b355d58fd4f649d30215d7b58d6d537e3f80",
+          "phase11_training_report": "b5b24071c277d1011762a193dadc3e3583ecf7967ace3dd8c444637d0e8758fe",
+          "phase11_comparison": "dabec984c2b523e5f948711b6669aa6440f94ef1800adb247002e37655aa096e"
+        },
+        "after": {
+          "v1_model": "7c72da959fd9d98411b758f65f3b1ea1b43fbec1a854facea064a5f1ec0c7488",
+          "v1_metadata": "c32705e031e93b5766a8b10fce24023bd5240a800b1238cf97f13797ad0428c4",
+          "v1_threshold": "16317aa3c4944669c631b864df030aa6cd8b09e292a29d9dfd4d040c503067a6",
+          "v2_model": "0e2ea322d0f16d918cd42e27bbd98af485e9b03b8ef0142b5067e43cbf4ab89e",
+          "v2_metadata": "614ec7955de0a24475628c9aef98f97af2d227674c16895bff186011d553b92e",
+          "v2_threshold": "3b181a9d06d878e646db99432465b355d58fd4f649d30215d7b58d6d537e3f80",
+          "phase11_training_report": "b5b24071c277d1011762a193dadc3e3583ecf7967ace3dd8c444637d0e8758fe",
+          "phase11_comparison": "dabec984c2b523e5f948711b6669aa6440f94ef1800adb247002e37655aa096e"
+        }
+      },
+      "details": "SHA-256 comparison before and after validation."
+    }
+  ],
+  "summary": {
+    "passed": 18,
+    "failed": 0,
+    "blocked": 1,
+    "total": 19
+  },
+  "artifact_hashes_before": {
+    "v1_model": "7c72da959fd9d98411b758f65f3b1ea1b43fbec1a854facea064a5f1ec0c7488",
+    "v1_metadata": "c32705e031e93b5766a8b10fce24023bd5240a800b1238cf97f13797ad0428c4",
+    "v1_threshold": "16317aa3c4944669c631b864df030aa6cd8b09e292a29d9dfd4d040c503067a6",
+    "v2_model": "0e2ea322d0f16d918cd42e27bbd98af485e9b03b8ef0142b5067e43cbf4ab89e",
+    "v2_metadata": "614ec7955de0a24475628c9aef98f97af2d227674c16895bff186011d553b92e",
+    "v2_threshold": "3b181a9d06d878e646db99432465b355d58fd4f649d30215d7b58d6d537e3f80",
+    "phase11_training_report": "b5b24071c277d1011762a193dadc3e3583ecf7967ace3dd8c444637d0e8758fe",
+    "phase11_comparison": "dabec984c2b523e5f948711b6669aa6440f94ef1800adb247002e37655aa096e"
+  },
+  "artifact_hashes_after": {
+    "v1_model": "7c72da959fd9d98411b758f65f3b1ea1b43fbec1a854facea064a5f1ec0c7488",
+    "v1_metadata": "c32705e031e93b5766a8b10fce24023bd5240a800b1238cf97f13797ad0428c4",
+    "v1_threshold": "16317aa3c4944669c631b864df030aa6cd8b09e292a29d9dfd4d040c503067a6",
+    "v2_model": "0e2ea322d0f16d918cd42e27bbd98af485e9b03b8ef0142b5067e43cbf4ab89e",
+    "v2_metadata": "614ec7955de0a24475628c9aef98f97af2d227674c16895bff186011d553b92e",
+    "v2_threshold": "3b181a9d06d878e646db99432465b355d58fd4f649d30215d7b58d6d537e3f80",
+    "phase11_training_report": "b5b24071c277d1011762a193dadc3e3583ecf7967ace3dd8c444637d0e8758fe",
+    "phase11_comparison": "dabec984c2b523e5f948711b6669aa6440f94ef1800adb247002e37655aa096e"
+  },
+  "notes": [
+    "No model training was performed.",
+    "Frozen Phase 3-11 artifacts were not modified.",
+    "Kafka/Spark end-to-end is BLOCKED because it was not actually executed."
+  ]
+}
