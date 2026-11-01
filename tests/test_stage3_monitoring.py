@@ -146,7 +146,7 @@ class Stage3MonitoringTests(unittest.TestCase):
         self.assertEqual(report["performance"]["status"], "insufficient_data")
         self.assertEqual([item["type"] for item in report["alerts"]], ["feature_drift"])
 
-    def test_synthetic_only_drift_does_not_create_retraining_request(self):
+    def test_synthetic_only_drift_requests_retraining_with_validation_warning(self):
         reference_path, reference = self._reference()
         current = reference.loc[:99, self.features].copy()
         for name in self.features[:8]:
@@ -157,10 +157,16 @@ class Stage3MonitoringTests(unittest.TestCase):
             monitor_db_path=report_path, model_version="V2", min_current=30)
         self.assertEqual(report["monitoring_basis"], "synthetic_only")
         self.assertEqual(report["drift_status"], "drift")
-        self.assertFalse(report["retraining_request"]["requested"])
+        self.assertTrue(report["retraining_request"]["requested"])
+        self.assertEqual(report["retraining_request"]["status"], "requested")
+        self.assertIn("synthetic-only evidence; validation required before deployment",
+                      report["retraining_request"]["reason"])
+        self.assertEqual(report["retraining_request"]["note"],
+                         "Recorded decision only; no training or model activation is performed.")
+        self.assertTrue(report["alerts"][0]["newly_recorded"])
         with closing(sqlite3.connect(report_path)) as db:
             self.assertEqual(db.execute("SELECT COUNT(*) FROM monitor_alerts").fetchone()[0], 1)
-            self.assertEqual(db.execute("SELECT COUNT(*) FROM retraining_requests").fetchone()[0], 0)
+            self.assertEqual(db.execute("SELECT COUNT(*) FROM retraining_requests").fetchone()[0], 1)
 
     def test_reference_read_error_is_reported_without_crashing_monitor(self):
         _, reference = self._reference()

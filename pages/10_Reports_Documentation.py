@@ -16,14 +16,14 @@ items = [
     ("Results and limitations", "docs/PROJECT_RESULTS_AND_LIMITATIONS.md", "Saved evaluation context and remaining limits"),
     ("Demo runbook", "docs/DEMO_RUNBOOK.md", "Local commands and runtime safety"),
     ("Presentation outline", "docs/PROJECT_PRESENTATION.md", "Academic handover and viva notes"),
-    ("Stage 1 streaming guide", "docs/STAGE1_STREAMING.md", "Producer, consumer, outputs, and checkpoints"),
-    ("Stage 2 delayed-label guide", "docs/STAGE2_LABELS.md", "Label provenance and idempotency"),
-    ("Stage 3 monitoring guide", "docs/STAGE3_MONITORING.md", "Drift sampling and monitoring behavior"),
-    ("Stage 4 retraining guide", "docs/STAGE4_RETRAINING.md", "Eligibility and candidate training gates"),
-    ("Stage 5 promotion guide", "docs/STAGE5_MODEL_PROMOTION.md", "Validation, approval, and rollback"),
-    ("Stage 6 demonstration guide", "docs/STAGE6_RETRAINING_DEMONSTRATION.md", "Synthetic candidate limitations"),
-    ("Stage 7 validation guide", "docs/STAGE7_END_TO_END_VALIDATION.md", "End-to-end validation evidence"),
-    ("Stage 7 saved validation report", "reports/stage7_end_to_end_validation_20261025T150813Z.json", "Recorded report; not regenerated here"),
+    ("Streaming guide", "docs/STAGE1_STREAMING.md", "Producer, consumer, outputs, and checkpoints"),
+    ("Delayed-label guide", "docs/STAGE2_LABELS.md", "Label provenance and idempotency"),
+    ("Monitoring guide", "docs/STAGE3_MONITORING.md", "Drift sampling and monitoring behavior"),
+    ("Retraining guide", "docs/STAGE4_RETRAINING.md", "Eligibility and candidate training requirements"),
+    ("Model activation guide", "docs/STAGE5_MODEL_PROMOTION.md", "Validation, approval, and rollback"),
+    ("Synthetic demonstration guide", "docs/STAGE6_RETRAINING_DEMONSTRATION.md", "Synthetic candidate limitations"),
+    ("End-to-end validation guide", "docs/STAGE7_END_TO_END_VALIDATION.md", "End-to-end validation evidence"),
+    ("Saved end-to-end validation report", "reports/stage7_end_to_end_validation_20261025T150813Z.json", "Recorded report; not regenerated here"),
     ("V1 vs V2 saved comparison", "reports/model_v1_vs_v2_comparison.json", "Historical held-out evaluation metrics"),
     ("V2 saved training report", "reports/model_v2_training_report.json", "Training split and evaluation metadata"),
 ]
@@ -33,7 +33,7 @@ for title, relative, detail in items:
     path = project_path(PROJECT_ROOT, relative)
     with st.container(border=True):
         st.markdown(f"**{title}**")
-        st.caption(f"{detail} · `{relative}`")
+        st.caption(detail)
         if path is None or not path.is_file():
             st.caption("Unavailable: file not found.")
             continue

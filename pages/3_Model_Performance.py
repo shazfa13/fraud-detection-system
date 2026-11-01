@@ -38,7 +38,7 @@ if isinstance(comparison, dict):
     v2 = comparison.get("v2_on_v2_test_split", {})
     if v2:
         st.caption(f"Evaluation split: V2 held-out test steps 566–743 · {v2.get('rows', '—')} rows; {v2.get('fraud_count', '—')} fraud examples · source: reports/model_v1_vs_v2_comparison.json")
-    st.caption(f"Historical Phase 11 decision: {comparison.get('decision', 'not recorded')} (kept as the original decision label).")
+    st.caption(f"Historical comparison decision: {comparison.get('decision', 'not recorded')}.")
     st.caption("Precision: share of predicted frauds that were fraud in the evaluation set. Recall: share of actual frauds detected. F1: precision/recall balance. PR-AUC: precision–recall performance across thresholds.")
 else: st.info(error or "Historical comparison report unavailable or malformed.")
 importance = read_project_csv(PROJECT_ROOT, "reports/model_v1_feature_importance.csv", limit=50)
@@ -49,8 +49,8 @@ render_section_heading("Lifecycle readiness", "The offline lifecycle coordinator
 report, _ = read_json_report(PROJECT_ROOT, "reports/recent_label_collection_report.json")
 label_type = report.get("ground_truth_label_type") if isinstance(report, dict) else None
 label_display = label_type or "Verified label source not configured"
-st.markdown("<div class='status-row'>" + status_pill(f"Label source: {label_display}", "warning") + status_pill("Promotion requires explicit Stage 5 approval", "historical") + status_pill("Automatic retraining: Not operational", "neutral") + "</div>", unsafe_allow_html=True)
+st.markdown("<div class='status-row'>" + status_pill(f"Label source: {label_display}", "warning") + status_pill("Activation requires explicit human approval", "historical") + status_pill("Automatic retraining: Not operational", "neutral") + "</div>", unsafe_allow_html=True)
 evidence = load_latest_phase12_evidence(PROJECT_ROOT)
-if evidence: st.caption(f"Phase 12 deployment/integration evidence: historical {evidence.get('status')} at {evidence.get('completed_at_utc', 'unknown time')}.")
-st.info("Promotion requires verified genuine labels, reliable transaction-ID matching, sufficient labels, and an explicit acceptance policy. Phase 9 currently records simulated historical PaySim labels, which do not satisfy that gate.")
+if evidence: st.caption(f"Saved integration evidence: historical {evidence.get('status')} at {evidence.get('completed_at_utc', 'unknown time')}.")
+st.info("Model activation requires verified genuine labels, reliable transaction-ID matching, sufficient labels, and explicit review. Current PaySim labels are simulated and do not satisfy that gate.")
 render_footer()

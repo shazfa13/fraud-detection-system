@@ -16,10 +16,13 @@ __pycache__/
 data/raw/
 data/processed/
 data/stage2/*.sqlite3*
+data/user_accounts.sqlite3*
+data/account_history.sqlite3*
 
 # Environment and secret files
 .env
 .env.*
+.streamlit/secrets.toml
 
 # IDE/editor files
 .vscode/

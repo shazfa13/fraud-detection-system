@@ -12,6 +12,27 @@ from services import api_client, data_service
 
 
 class DashboardDataServiceTests(unittest.TestCase):
+    def test_recent_stage1_predictions_reads_newest_registry_rows_read_only(self) -> None:
+        import sqlite3
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "labels.sqlite3"
+            with closing(sqlite3.connect(path)) as db:
+                db.execute("""CREATE TABLE predictions(
+                    transaction_id TEXT PRIMARY KEY, prediction INTEGER, fraud_probability REAL,
+                    risk_score REAL, risk_level TEXT, prediction_timestamp TEXT, registered_at TEXT,
+                    model_version TEXT, data_origin TEXT, kafka_topic TEXT,
+                    kafka_partition INTEGER, kafka_offset INTEGER)""")
+                db.executemany("INSERT INTO predictions VALUES(?,?,?,?,?,?,?,?,?,?,?,?)", [
+                    ("old", 0, .1, 10, "LOW", "2026-10-27T14:13:00+00:00", "2026-10-27T14:13:00+00:00", "V2", "synthetic", "fraud-transactions", 0, 1),
+                    ("new", 1, .9, 90, "HIGH", "2026-10-30T14:13:00+00:00", "2026-10-30T14:13:00+00:00", "V2", "synthetic", "fraud-transactions", 0, 2),
+                ])
+                db.commit()
+            before = path.stat().st_size
+            rows = data_service.recent_stage1_predictions(path, limit=1)
+            self.assertEqual([row["transaction_id"] for row in rows], ["new"])
+            self.assertEqual(rows[0]["prediction_timestamp"], "2026-10-30T14:13:00+00:00")
+            self.assertEqual(path.stat().st_size, before)
+
     def test_prediction_registry_summary_uses_read_only_counts_and_range(self) -> None:
         import sqlite3
         with tempfile.TemporaryDirectory() as temporary:
@@ -126,7 +147,24 @@ class DashboardAPIClientTests(unittest.TestCase):
         with patch.object(api_client.requests, "request", return_value=response) as request:
             result = api_client.predict_transaction(payload, base_url="http://example.test")
         self.assertEqual(result["model_version"], "V2")
+        self.assertEqual(result["fraud_probability"], 0.2)
         self.assertEqual(request.call_args.kwargs["json"], payload)
+
+    def test_analysis_client_preserves_exact_probability_and_ordered_features(self) -> None:
+        payload = {"step": 1, "type": "PAYMENT", "amount": 10.0, "nameOrig": "C1",
+                   "oldbalanceOrg": 20.0, "nameDest": "C2", "oldbalanceDest": 0.0}
+        names = [f"feature_{index}" for index in range(34)]
+        response = Mock(ok=True, status_code=200)
+        response.json.return_value = {"prediction": 0, "fraud_probability": 0.42887654,
+            "risk_score": 42.8877, "risk_level": "MEDIUM", "model_version": "V2",
+            "feature_names": names, "features": dict.fromkeys(names, 0.0),
+            "history_status": {"sender": {"state": "no_prior_transactions"}}}
+        with patch.object(api_client.requests, "request", return_value=response) as request:
+            result = api_client.analyze_transaction(payload, idempotency_key="ui-analysis-1",
+                                                     base_url="http://example.test")
+        self.assertEqual(result["fraud_probability"], 0.42887654)
+        self.assertEqual(request.call_args.kwargs["headers"], {"Idempotency-Key": "ui-analysis-1"})
+        self.assertEqual(request.call_args.args[:2], ("POST", "http://example.test/analyze"))
 
     def test_target_and_audit_features_are_rejected_before_network_call(self) -> None:
         payload = {"step": 1, "type": "PAYMENT", "amount": 10.0, "nameOrig": "C1",

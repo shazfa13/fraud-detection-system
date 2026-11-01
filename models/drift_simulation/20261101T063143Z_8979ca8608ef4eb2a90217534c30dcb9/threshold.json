@@ -1,0 +1,13 @@
+{
+  "run_id": "20261101T063143Z_8979ca8608ef4eb2a90217534c30dcb9",
+  "selected_threshold": 0.32,
+  "method": "maximum F1 on synthetic validation; Phase 11 tie-breaks precision then lower threshold",
+  "validation_rows": 12000,
+  "validation_metrics": {
+    "precision": 0.9994846688997681,
+    "recall": 0.9997422680412371,
+    "f1": 0.9996134518747584
+  },
+  "test_used": false,
+  "label_provenance": "SIMULATED_NOTEBOOK_CONCEPT_RULE"
+}

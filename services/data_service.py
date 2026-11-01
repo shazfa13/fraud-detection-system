@@ -270,6 +270,33 @@ def prediction_registry_summary(database_path: str | Path | None = None) -> dict
         return {"available": False, "error": "Prediction registry could not be read safely."}
 
 
+def recent_stage1_predictions(database_path: str | Path | None = None,
+                              *, limit: int = MAX_HISTORY_ROWS) -> list[dict[str, Any]] | None:
+    """Read newest Stage 1 predictions from the read-only Stage 2 registry."""
+    if database_path is None:
+        from src.labels.config import STAGE2_DB_PATH
+        database_path = STAGE2_DB_PATH
+    path = Path(database_path)
+    if not path.is_file():
+        return None
+    if limit <= 0:
+        return []
+    try:
+        uri = f"file:{path.resolve().as_posix()}?mode=ro"
+        with closing(sqlite3.connect(uri, uri=True, timeout=3)) as db:
+            db.execute("PRAGMA query_only=ON")
+            db.row_factory = sqlite3.Row
+            rows = db.execute("""SELECT transaction_id, prediction, fraud_probability,
+                    risk_score, risk_level, prediction_timestamp, registered_at,
+                    model_version, data_origin, kafka_topic, kafka_partition, kafka_offset
+                FROM predictions
+                ORDER BY registered_at DESC, rowid DESC
+                LIMIT ?""", (min(int(limit), MAX_HISTORY_ROWS),)).fetchall()
+        return [dict(row) for row in rows]
+    except (sqlite3.Error, OSError, ValueError, TypeError):
+        return None
+
+
 def stage2_label_overview(database_path: str | Path | None = None) -> dict[str, Any]:
     """Read label provenance and submission dispositions without exposing credentials."""
     if database_path is None:

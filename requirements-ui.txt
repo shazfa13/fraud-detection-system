@@ -1,2 +1,3 @@
-# Optional presentation dashboard dependency; backend requirements remain unchanged.
+# Presentation dependencies, including local per-transaction SHAP explanations.
 streamlit>=1.38,<2
+shap==0.54.1

@@ -25,11 +25,12 @@ def api_base_url() -> str:
 
 
 def _request_json(method: str, path: str, *, payload: Mapping[str, Any] | None = None,
-                  base_url: str | None = None, timeout: float = DEFAULT_TIMEOUT_SECONDS) -> dict[str, Any]:
+                  base_url: str | None = None, timeout: float = DEFAULT_TIMEOUT_SECONDS,
+                  headers: Mapping[str, str] | None = None) -> dict[str, Any]:
     """Perform a bounded request and normalize network/HTTP/JSON failures."""
     url = f"{(base_url or api_base_url()).rstrip('/')}{path}"
     try:
-        response = requests.request(method, url, json=payload, timeout=timeout)
+        response = requests.request(method, url, json=payload, headers=headers, timeout=timeout)
     except requests.RequestException as exc:
         raise APIClientError(f"Could not reach the FastAPI service at {url}: {exc}") from exc
     try:
@@ -83,10 +84,12 @@ def _validate_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def predict_transaction(payload: Mapping[str, Any], *, base_url: str | None = None,
-                        timeout: float = DEFAULT_TIMEOUT_SECONDS) -> dict[str, Any]:
+                        timeout: float = DEFAULT_TIMEOUT_SECONDS,
+                        idempotency_key: str | None = None) -> dict[str, Any]:
     """Submit only transaction-time request fields to the existing `/predict` route."""
+    headers = {"Idempotency-Key": idempotency_key} if idempotency_key else None
     body = _request_json("POST", "/predict", payload=_validate_payload(payload),
-                         base_url=base_url, timeout=timeout)
+                         base_url=base_url, timeout=timeout, headers=headers)
     required = {"prediction", "fraud_probability", "risk_score", "risk_level", "model_version"}
     if not required.issubset(body):
         raise APIClientError("The API prediction response is missing required fields.")
@@ -98,6 +101,37 @@ def predict_transaction(payload: Mapping[str, Any], *, base_url: str | None = No
         raise APIClientError("The API prediction response contains invalid numeric values.") from exc
     if prediction not in (0, 1) or not 0.0 <= probability <= 1.0 or not 0.0 <= score <= 100.0:
         raise APIClientError("The API prediction response is outside the expected ranges.")
+    return body
+
+
+def analyze_transaction(payload: Mapping[str, Any], *, idempotency_key: str,
+                        base_url: str | None = None,
+                        timeout: float = DEFAULT_TIMEOUT_SECONDS) -> dict[str, Any]:
+    """Atomically score and return the exact feature vector and history status for SHAP."""
+    if not idempotency_key or not isinstance(idempotency_key, str):
+        raise APIClientError("An idempotency key is required for transaction analysis.")
+    body = _request_json("POST", "/analyze", payload=_validate_payload(payload),
+                         base_url=base_url, timeout=timeout,
+                         headers={"Idempotency-Key": idempotency_key})
+    required = {"prediction", "fraud_probability", "risk_score", "risk_level", "model_version",
+                "feature_names", "features", "history_status"}
+    if not required.issubset(body):
+        raise APIClientError("The API analysis response is missing required prediction or feature fields.")
+    try:
+        probability = float(body["fraud_probability"])
+        score = float(body["risk_score"])
+        prediction = int(body["prediction"])
+    except (TypeError, ValueError) as exc:
+        raise APIClientError("The API analysis response contains invalid numeric values.") from exc
+    names, features = body["feature_names"], body["features"]
+    if prediction not in (0, 1) or not 0.0 <= probability <= 1.0 or not 0.0 <= score <= 100.0:
+        raise APIClientError("The API analysis response is outside the expected ranges.")
+    if not isinstance(names, list) or len(names) != 34 or not isinstance(features, dict) or list(features) != names:
+        raise APIClientError("The API analysis features do not match the ordered 34-feature contract.")
+    if any(key in names for key in FORBIDDEN_FIELDS | {"event_id", "step"}):
+        raise APIClientError("The API analysis included an audit field or target in the model feature contract.")
+    if not isinstance(body["history_status"], dict):
+        raise APIClientError("The API analysis returned an invalid account-history status.")
     return body
 
 

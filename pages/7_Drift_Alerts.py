@@ -1,4 +1,4 @@
-"""Read-only Stage 3 drift and alert viewer."""
+"""Read-only saved drift and alert viewer."""
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -10,11 +10,11 @@ from services.data_service import load_stage3_monitor_report
 from ui.components import configure_page, render_footer, render_hero, render_section_heading, status_pill
 
 configure_page("Drift & Alerts", "⌁")
-render_hero("Drift & Alerts", "Persisted Stage 3 evidence",
+render_hero("Drift & Alerts", "Saved monitoring evidence",
             "Shows the latest saved monitor report and alert evidence. Viewing this page does not execute the monitor or write to its database.")
 report = load_stage3_monitor_report()
 if not report:
-    st.info("No readable Stage 3 monitoring report is available.")
+    st.info("No readable monitoring report is available.")
 else:
     generated = report.get("generated_at")
     try:

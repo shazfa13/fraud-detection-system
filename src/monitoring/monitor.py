@@ -409,11 +409,16 @@ def run_monitor(*, stage1_path: Path | None = None, reference_path: Path | None 
                        "window_end": performance["evaluation_window"]["end"], "evidence": performance})
     status = "degraded" if performance["status"] == "degraded" else (
         "insufficient_data" if performance["status"] == "insufficient_data" or drift_status == "insufficient_data" else "healthy")
-    reasons = [a["type"] for a in alerts]
-    request_allowed = bool(alerts) and not synthetic_only
-    request_reason = (", ".join(reasons) if request_allowed else
-                      "Synthetic-only monitoring window; no retraining request authorized." if alerts and synthetic_only else
-                      "No actionable drift or performance alert.")
+    actionable_alerts = [a for a in alerts
+                          if a["type"] in {"feature_drift", "performance_degradation"}]
+    reasons = [a["type"] for a in actionable_alerts]
+    request_allowed = bool(actionable_alerts)
+    if request_allowed:
+        request_reason = ", ".join(reasons)
+        if synthetic_only:
+            request_reason += " (synthetic-only evidence; validation required before deployment)"
+    else:
+        request_reason = "No actionable drift or performance alert."
     report = {"generated_at": generated, "model_version": model,
         "threshold": float(_json(config.MODEL_THRESHOLD_PATHS[model])["selected_threshold"]),
         "active_model_source": active_model_source(),

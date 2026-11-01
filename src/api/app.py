@@ -10,9 +10,10 @@ Pipeline implemented here:
 
     Raw transaction (HTTP request)
         -> Pydantic validation
-        -> update/read per-account historical state (in-memory, dev-only - see AccountState)
+        -> read genuine earlier transactions from SQLite account history
         -> compute the same candidate features Phase 3 defines
         -> select the EXACT feature names/order the selected model was trained on
+        -> persist the current transaction after scoring; expose the exact features for explanation
         -> XGBoost Model V2 (or V1 rollback) .predict_proba()
         -> fraud_probability, risk_score, risk_level, model_version
 
@@ -36,10 +37,12 @@ from typing import Optional
 
 import numpy as np
 import pandas as pd
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field, field_validator
 from xgboost import XGBClassifier
 from src.retraining.active_model import resolve_active_model
+from src.api.account_history import (AccountHistoryStore, AccountHistoryUnavailable,
+                                     IdempotencyConflict)
 
 logger = logging.getLogger("fraud_api")
 logging.basicConfig(level=logging.INFO)
@@ -246,10 +249,12 @@ class AccountState:
 
 # One shared, process-wide state instance (see AccountState docstring for its scope/limitations).
 account_state = AccountState()
+account_history_store = AccountHistoryStore()
 
 
 
-def build_feature_vector(txn: "TransactionRequest", update_state: bool = True) -> pd.DataFrame:
+def build_feature_vector(txn: "TransactionRequest", update_state: bool = True,
+                         state_features: dict | None = None) -> pd.DataFrame:
     """
     Full pipeline: raw transaction -> candidate SAFE/POTENTIAL_RISK features -> exact Model V1
     feature names, in the exact expected order. Raises ValueError (-> HTTP 400) on any mismatch
@@ -259,9 +264,10 @@ def build_feature_vector(txn: "TransactionRequest", update_state: bool = True) -
     candidate.update(create_temporal_features(txn.step))
     candidate.update(create_amount_features(txn.amount, txn.oldbalanceOrg, txn.oldbalanceDest))
     candidate.update(create_balance_features(txn.oldbalanceOrg, txn.oldbalanceDest))
-    state_features = (account_state.compute_and_update(txn.nameOrig, txn.nameDest, txn.step, txn.amount)
-                      if update_state else account_state.preview_features(txn.nameOrig, txn.nameDest, txn.step, txn.amount))
-    candidate.update(state_features)
+    resolved_state_features = (state_features if state_features is not None else
+        (account_state.compute_and_update(txn.nameOrig, txn.nameDest, txn.step, txn.amount)
+         if update_state else account_state.preview_features(txn.nameOrig, txn.nameDest, txn.step, txn.amount)))
+    candidate.update(resolved_state_features)
     candidate.update(encode_transaction_type(txn.type))
     if RETAIN_FLAG_FEATURE:
         candidate["is_flagged_by_rule"] = int(txn.isFlaggedFraud or 0)
@@ -281,15 +287,47 @@ def assign_risk_level(score: float) -> str:
     return "HIGH"
 
 
-def predict_transaction(txn: "TransactionRequest") -> dict:
-    """The full scoring function used by POST /predict."""
-    X = build_feature_vector(txn)
-    fraud_probability = float(model.predict_proba(X)[:, 1][0])
-    predicted_label = int(fraud_probability >= CLASSIFICATION_THRESHOLD)
-    risk_score = round(fraud_probability * 100, 4)               # Model-derived Risk Score (Phase 4 definition) - not independently calibrated
-    risk_level = assign_risk_level(risk_score)
-    return {"prediction": predicted_label, "fraud_probability": fraud_probability, "risk_score": risk_score,
-            "risk_level": risk_level, "model_version": MODEL_VERSION}
+def _history_request(txn: "TransactionRequest") -> dict:
+    return {"step": int(txn.step), "type": txn.type, "amount": float(txn.amount),
+            "nameOrig": txn.nameOrig, "oldbalanceOrg": float(txn.oldbalanceOrg),
+            "nameDest": txn.nameDest, "oldbalanceDest": float(txn.oldbalanceDest)}
+
+
+def _features_json(frame: pd.DataFrame) -> dict[str, float | None]:
+    return {name: (None if pd.isna(value) else float(value)) for name, value in frame.iloc[0].items()}
+
+
+def _process_prediction(txn: "TransactionRequest", idempotency_key: str | None = None) -> dict:
+    """Atomically compute history, predict, and persist one transaction."""
+    request = _history_request(txn)
+
+    def build_with_history(history: dict) -> tuple[pd.DataFrame, dict]:
+        frame = build_feature_vector(txn, state_features=history)
+        return frame, _features_json(frame)
+
+    def score(frame: pd.DataFrame) -> dict:
+        fraud_probability = float(model.predict_proba(frame)[:, 1][0])
+        predicted_label = int(fraud_probability >= CLASSIFICATION_THRESHOLD)
+        risk_score = round(fraud_probability * 100, 4)
+        risk_level = assign_risk_level(risk_score)
+        return {"prediction": predicted_label, "fraud_probability": fraud_probability,
+                "risk_score": risk_score, "risk_level": risk_level, "model_version": MODEL_VERSION}
+
+    outcome = account_history_store.process(request, idempotency_key=idempotency_key,
+                                            feature_builder=build_with_history, predictor=score)
+    return outcome
+
+
+def predict_transaction(txn: "TransactionRequest", idempotency_key: str | None = None) -> dict:
+    """The full scoring function used by POST /predict, backed by persistent history."""
+    return _process_prediction(txn, idempotency_key)["result"]
+
+
+def analyze_transaction(txn: "TransactionRequest", idempotency_key: str | None = None) -> dict:
+    """Return prediction and the exact feature row used, for a matching explanation."""
+    outcome = _process_prediction(txn, idempotency_key)
+    return {**outcome["result"], "features": outcome["features"], "feature_names": FINAL_FEATURES,
+            "history_status": outcome["history_status"]}
 
 
 def log_prediction(result: dict) -> None:
@@ -346,6 +384,12 @@ class PredictionResponse(BaseModel):
     model_version: str
 
 
+class AnalysisResponse(PredictionResponse):
+    feature_names: list[str]
+    features: dict[str, float | None]
+    history_status: dict[str, dict]
+
+
 # ---------------------------------------------------------------------------------------------
 # FastAPI application
 # ---------------------------------------------------------------------------------------------
@@ -375,36 +419,77 @@ def health():
 
 @app.post("/state/reset")
 def reset_state():
-    """Development-only reset for deterministic historical replay before Phase 6."""
+    """Reset volatile replay state without deleting durable account transaction history."""
     account_state.reset()
-    return {"status": "reset", "account_state": account_state.account_count()}
+    return {"status": "reset", "account_state": account_state.account_count(),
+            "persistent_history": "preserved"}
 
 
 @app.post("/state/warmup")
-def warmup_state(transactions: list[TransactionRequest]):
-    """Replay pre-live transactions into AccountState without model prediction or logging."""
+def warmup_state(transactions: list[TransactionRequest],
+                 idempotency_key: str | None = Header(default=None, alias="Idempotency-Key")):
+    """Persist explicitly supplied prior events without prediction or labels."""
+    records = [_history_request(txn) for txn in transactions]
+    try:
+        inserted = account_history_store.warmup(records, batch_key=idempotency_key)
+    except IdempotencyConflict as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except (AccountHistoryUnavailable, ValueError) as exc:
+        raise HTTPException(status_code=503 if isinstance(exc, AccountHistoryUnavailable) else 400,
+                            detail=str(exc)) from exc
     for txn in transactions:
         account_state.compute_and_update(txn.nameOrig, txn.nameDest, txn.step, txn.amount)
     return {"status": "warmed", "processed_transactions": len(transactions),
-            "account_state": account_state.account_count()}
+            "new_history_records": inserted, "account_state": account_state.account_count(),
+            "persistent_history": "updated"}
 
 @app.post("/state/preview")
 def preview_state(txn: TransactionRequest):
-    """Return the exact Model V1 feature vector without consuming the transaction."""
-    row = build_feature_vector(txn, update_state=False).iloc[0]
-    features = {name: (None if pd.isna(value) else float(value)) for name, value in row.items()}
-    return {"features": features,
-            "feature_names": FINAL_FEATURES}
+    """Return features built from currently persisted earlier transactions, without inserting."""
+    try:
+        history, history_status = account_history_store.preview(_history_request(txn))
+        row = build_feature_vector(txn, state_features=history).iloc[0]
+    except AccountHistoryUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    return {"features": _features_json(row.to_frame().T),
+            "feature_names": FINAL_FEATURES, "history_status": history_status}
 
 
 @app.post("/predict", response_model=PredictionResponse)
-def predict(txn: TransactionRequest):
+def predict(txn: TransactionRequest,
+            idempotency_key: str | None = Header(default=None, alias="Idempotency-Key")):
     try:
-        result = predict_transaction(txn)
+        outcome = _process_prediction(txn, idempotency_key=idempotency_key)
+    except IdempotencyConflict as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except AccountHistoryUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
     except ValueError as exc:                                     # feature mismatch - our own guard above
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:                                      # unexpected - never leak internals to the client
         logger.exception("Unexpected error during prediction")
         raise HTTPException(status_code=500, detail="Internal error while generating a prediction.") from exc
-    log_prediction(result)
-    return result
+    if not outcome["replayed"]:
+        log_prediction(outcome["result"])
+    return outcome["result"]
+
+
+@app.post("/analyze", response_model=AnalysisResponse)
+def analyze(txn: TransactionRequest,
+            idempotency_key: str | None = Header(default=None, alias="Idempotency-Key")):
+    """Score once and return the exact feature row used by the User Portal explanation."""
+    try:
+        outcome = _process_prediction(txn, idempotency_key=idempotency_key)
+    except IdempotencyConflict as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except AccountHistoryUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        logger.exception("Unexpected error during transaction analysis")
+        raise HTTPException(status_code=500, detail="Internal error while generating an analysis.") from exc
+    if not outcome["replayed"]:
+        log_prediction(outcome["result"])
+    return {**outcome["result"], "features": outcome["features"], "feature_names": FINAL_FEATURES,
+            "history_status": outcome["history_status"]}

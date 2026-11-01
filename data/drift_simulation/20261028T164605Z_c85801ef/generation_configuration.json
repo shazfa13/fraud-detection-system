@@ -1,0 +1,111 @@
+{
+  "run_id": "20261028T164605Z_c85801ef",
+  "seed": 20261028,
+  "source_dataset": "data\\processed\\v2_retraining_dataset.parquet",
+  "source_sha256": "e50ab9b49f409c88cd97b141b2acef733ee2480fd52f365a06136e38953a8f14",
+  "raw_paysim_source": "data/raw/PS_20174392719_1491204439457_log.csv",
+  "method": "weighted bootstrap of complete engineered PaySim rows with replacement",
+  "shift_parameters_fixed_before_sampling": true,
+  "shift_parameter_selection_uses_heldout_test_outcomes": false,
+  "shift_parameter_selection_uses_heldout_test_features": false,
+  "heldout_test_covariates_used_to_apply_fixed_weights": true,
+  "training_based_profile": {
+    "train_rows": 5015193,
+    "step_min": 1,
+    "step_max": 422,
+    "amount_quantiles": {
+      "0.5": 74696.34,
+      "0.75": 207698.05,
+      "0.9": 362764.812,
+      "0.95": 510003.1139999983,
+      "0.99": 1473539.9116
+    },
+    "amount_cutoff_for_shift": 362764.812,
+    "amount_cutoff_quantile": 0.9,
+    "transaction_type_proportions": {
+      "CASH_IN": 0.21885418965930126,
+      "CASH_OUT": 0.3541403092562938,
+      "DEBIT": 0.006280117235767397,
+      "PAYMENT": 0.33801989275387806,
+      "TRANSFER": 0.08270549109475947
+    },
+    "fraud_prevalence_descriptive_only": 0.0008376547024212229
+  },
+  "weighting": {
+    "covariates": [
+      "amount >= historical training p90",
+      "type_TRANSFER",
+      "type_CASH_OUT"
+    ],
+    "strength": 2.0,
+    "amount_quantile": 0.9,
+    "amount_cutoff": 362764.812,
+    "high_amount_weight": 2.0,
+    "transfer_weight": 2.2,
+    "cash_out_weight": 1.25,
+    "weighting_label_or_target": false
+  },
+  "source_partitions": {
+    "synthetic_train_source": {
+      "rows": 5015193,
+      "step_max": 422
+    },
+    "validation_excluded_from_candidate_fit": {
+      "rows": 185387,
+      "step_min": 423,
+      "step_max": 565
+    },
+    "synthetic_test_source": {
+      "rows": 181624,
+      "step_min": 566,
+      "step_max": 743
+    },
+    "source_event_overlap_train_vs_test": 0
+  },
+  "synthetic_train_rows": 25000,
+  "synthetic_test_rows": 25000,
+  "synthetic_train_path": "data\\drift_simulation\\20261028T164605Z_c85801ef\\synthetic_train.csv",
+  "portable_synthetic_test_csv": "data\\drift_simulation\\synthetic_drift_data.csv",
+  "label_policy": "Each isFraud label is copied exactly from its source PaySim record. Labels are inherited simulator labels, not independently verified outcomes.",
+  "model_features": [
+    "hour_of_day",
+    "amount",
+    "log_amount",
+    "is_large_amount",
+    "amount_to_sender_balance_ratio",
+    "amount_ge_sender_balance",
+    "sender_remaining_if_debited",
+    "amount_to_dest_balance_ratio",
+    "sender_balance_before",
+    "sender_balance_zero_before",
+    "dest_balance_before",
+    "dest_balance_zero_before",
+    "sender_prev_txn_count",
+    "sender_prev_total_amount",
+    "sender_prev_mean_amount",
+    "sender_prev_max_amount",
+    "dest_prev_txn_count",
+    "dest_prev_total_amount",
+    "dest_prev_mean_amount",
+    "dest_prev_max_amount",
+    "amount_vs_sender_hist_mean",
+    "amount_vs_dest_hist_mean",
+    "sender_hours_since_prev_txn",
+    "dest_hours_since_prev_txn",
+    "dest_txn_count_last_1h",
+    "dest_txn_count_last_24h",
+    "dest_txn_count_last_168h",
+    "dest_amount_sum_last_24h",
+    "dest_amount_sum_last_168h",
+    "type_CASH_IN",
+    "type_CASH_OUT",
+    "type_DEBIT",
+    "type_PAYMENT",
+    "type_TRANSFER"
+  ],
+  "audit_columns": [
+    "event_id",
+    "step"
+  ],
+  "target": "isFraud"
+}

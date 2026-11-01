@@ -4,12 +4,14 @@ from __future__ import annotations
 import json
 import tempfile
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import patch
 
 from src.streaming import config
 from src.streaming import stage1_producer
 from src.streaming.stage1_streaming import process_batch, validate_event
+from src.labels.store import get_prediction
 
 
 class Stage1ValidationTests(unittest.TestCase):
@@ -65,10 +67,14 @@ class Stage1ValidationTests(unittest.TestCase):
             self.assertEqual(record["model_version"], "V2")
             self.assertIn("fraud_probability", record)
             self.assertIn("processing_timestamp_utc", record)
+            processed_at = datetime.fromisoformat(record["processing_timestamp_utc"])
+            self.assertLess(abs((datetime.now(timezone.utc) - processed_at).total_seconds()), 5)
             self.assertIn("kafka_offset", record)
             self.assertEqual(len(record["feature_values"]), 34)
             self.assertNotIn("isFraud", record["feature_values"])
             self.assertNotIn("isFraud", record)
+            stored = get_prediction("SYNTH-1", database)
+            self.assertEqual(stored["prediction_timestamp"], record["processing_timestamp_utc"])
             self.assertFalse(errors.exists())
 
     def test_sqlite_failure_does_not_lose_jsonl_prediction_or_stop_batch(self) -> None:

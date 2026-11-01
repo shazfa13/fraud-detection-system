@@ -1,4 +1,4 @@
-"""Read-only Stage 2 delayed-label registry view."""
+"""Read-only delayed-label registry view."""
 from __future__ import annotations
 
 import pandas as pd
@@ -8,12 +8,12 @@ from services.data_service import load_stage2_label_stats, stage2_label_overview
 from ui.components import configure_page, render_footer, render_hero, render_section_heading
 
 configure_page("Delayed Labels", "◷")
-render_hero("Delayed Labels", "Stage 2 label registry",
+render_hero("Delayed Labels", "Verified outcome registry",
             "Counts and provenance are read from the existing SQLite database. This page never edits labels or reveals configured credentials.")
 stats = load_stage2_label_stats()
 overview = stage2_label_overview()
 if not stats.get("store_available"):
-    st.info(stats.get("error", "Stage 2 store is unavailable."))
+    st.info(stats.get("error", "The label registry is unavailable."))
 else:
     keys = (("Predictions registered", "predictions_registered"), ("Unresolved predictions", "pending_labels"),
             ("Resolved genuine labels", "confirmed_genuine_labels"), ("Synthetic test labels", "synthetic_test_labels"))
@@ -30,7 +30,7 @@ else:
     elif not stats.get("genuine_labels_available"):
         st.info("An authorized source is configured, but the registry has no eligible genuine verified labels.")
     else:
-        st.success("At least one joined genuine verified label is available; see Stage 4 gates before any training action.")
+        st.success("At least one joined genuine verified label is available; eligibility checks still apply before training.")
 
 render_section_heading("Label provenance and resolution", "Grouped counts from labels(source_type, label_source, status); no record contents or tokens are displayed.")
 if overview.get("available") and overview.get("labels"):
@@ -39,7 +39,7 @@ elif overview.get("available"):
     st.info("No label records are stored.")
 else:
     st.info(overview.get("error", "Label provenance is unavailable."))
-render_section_heading("Submission audit dispositions", "Duplicate, accepted, rejected, and conflict decisions remain in the Stage 2 audit table.")
+render_section_heading("Submission audit dispositions", "Duplicate, accepted, rejected, and conflict decisions remain in the audit table.")
 if overview.get("available") and overview.get("submissions"):
     st.dataframe(pd.DataFrame(overview["submissions"]), use_container_width=True, hide_index=True)
 else:
