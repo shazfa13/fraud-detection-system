@@ -1,5 +1,7 @@
 # Stage 4: Safe candidate retraining workflow
 
+> **Current status (2026-11-01):** This guide documents the Stage 4 CLI workflow. The repository also contains the newer `src/orchestrator/` package and Model Orchestrator page. The page currently disables real candidate start; no orchestrator run or genuine verified-label cohort is present, so real retraining remains blocked in this workspace. The separate drift simulation is synthetic and does not satisfy Stage 4 gates. See [system workflow](PROJECT_WORKFLOW.md) and [controlled simulation](DRIFT_SIMULATION.md).
+
 Stage 4 reads the Stage 2 label store in SQLite `mode=ro` and reads Stage 1's
 prediction JSONL. It never changes labels, predictions, Stage 3 alerts or requests.
 It does not consume a drift alert as permission to train. A candidate model is

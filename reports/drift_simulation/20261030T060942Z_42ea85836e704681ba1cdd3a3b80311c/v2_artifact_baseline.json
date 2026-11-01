@@ -1,0 +1,53 @@
+{
+  "run_id": "20261030T060942Z_42ea85836e704681ba1cdd3a3b80311c",
+  "active_version": "V2",
+  "active_source": "legacy V2 default or FRAUD_ACTIVE_MODEL_VERSION environment",
+  "active_artifact": "models\\xgboost_model_v2.json",
+  "threshold": 0.53,
+  "features": [
+    "hour_of_day",
+    "amount",
+    "log_amount",
+    "is_large_amount",
+    "amount_to_sender_balance_ratio",
+    "amount_ge_sender_balance",
+    "sender_remaining_if_debited",
+    "amount_to_dest_balance_ratio",
+    "sender_balance_before",
+    "sender_balance_zero_before",
+    "dest_balance_before",
+    "dest_balance_zero_before",
+    "sender_prev_txn_count",
+    "sender_prev_total_amount",
+    "sender_prev_mean_amount",
+    "sender_prev_max_amount",
+    "dest_prev_txn_count",
+    "dest_prev_total_amount",
+    "dest_prev_mean_amount",
+    "dest_prev_max_amount",
+    "amount_vs_sender_hist_mean",
+    "amount_vs_dest_hist_mean",
+    "sender_hours_since_prev_txn",
+    "dest_hours_since_prev_txn",
+    "dest_txn_count_last_1h",
+    "dest_txn_count_last_24h",
+    "dest_txn_count_last_168h",
+    "dest_amount_sum_last_24h",
+    "dest_amount_sum_last_168h",
+    "type_CASH_IN",
+    "type_CASH_OUT",
+    "type_DEBIT",
+    "type_PAYMENT",
+    "type_TRANSFER"
+  ],
+  "fixed_v2_sha256_before": {
+    "model": "0e2ea322d0f16d918cd42e27bbd98af485e9b03b8ef0142b5067e43cbf4ab89e",
+    "metadata": "614ec7955de0a24475628c9aef98f97af2d227674c16895bff186011d553b92e",
+    "threshold": "3b181a9d06d878e646db99432465b355d58fd4f649d30215d7b58d6d537e3f80"
+  },
+  "active_bundle_sha256_before": {
+    "model.json": "0e2ea322d0f16d918cd42e27bbd98af485e9b03b8ef0142b5067e43cbf4ab89e",
+    "metadata.json": "614ec7955de0a24475628c9aef98f97af2d227674c16895bff186011d553b92e",
+    "threshold.json": "3b181a9d06d878e646db99432465b355d58fd4f649d30215d7b58d6d537e3f80"
+  }
+}

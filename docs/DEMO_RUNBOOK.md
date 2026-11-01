@@ -8,7 +8,7 @@ This runbook describes the existing Windows PowerShell setup. Running the live p
 - The PaySim CSV at `data/raw/PS_20174392719_1491204439457_log.csv` for the producer.
 - A locally installed/configured Kafka broker at `127.0.0.1:9092`, with topic `fraud-transactions` configured for one partition.
 - Java/JDK for Spark. The configured Spark Kafka connector may be fetched from Maven Central on first launch. The Windows Spark setup expects `tools/hadoop/bin/winutils.exe`; check the console message if it is missing.
-- The current environment was Python 3.12.7 and had Uvicorn 0.54.0. `requirements.txt` declares FastAPI but does not list Uvicorn; verify it is available in a fresh environment before using the Uvicorn command. No dependencies were installed or changed for Phase 14.
+- A prior local environment snapshot recorded Python 3.12.7 and Uvicorn 0.54.0; verify the versions in your environment. `requirements.txt` declares FastAPI but does not list Uvicorn, so install/check it separately before using the Uvicorn command. No dependencies were installed for that prior documentation pass.
 
 From a PowerShell terminal:
 
@@ -156,6 +156,8 @@ Phase 13 recorded 57 passing Stage 1–6 tests and 107 passing tests overall. Th
 
 ## Detailed references
 
+- [Dashboard guide](../DASHBOARD_README.md) and [user guide](UI_USER_GUIDE.md)
+- [Controlled drift simulation](DRIFT_SIMULATION.md)
 - [System workflow and architecture](PROJECT_WORKFLOW.md)
 - [Results and limitations](PROJECT_RESULTS_AND_LIMITATIONS.md)
 - [Presentation outline and viva preparation](PROJECT_PRESENTATION.md)

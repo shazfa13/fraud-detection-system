@@ -70,7 +70,7 @@ This outline is designed for a 10–12 slide B.Tech CSE project defense. Present
 ### 8. Guarded retraining and model lifecycle
 
 - Stage 4 checks provenance, matching, conflicts, feature vectors, and minimum eligible-label counts.
-- Stage 5 compares a separate candidate with the active model and binds human approval to exact artifacts and evaluation evidence.
+- Stage 5 and the newer Orchestrator package validate separate candidates; review and promotion bind administrator decisions to exact artifacts and evaluation evidence. The current Orchestrator page disables real candidate start while genuine-label readiness is blocked.
 - Promotion and rollback are explicit operations; running services need restart to load a new model.
 - Stage 6 demonstration artifacts are blocked from genuine promotion.
 
@@ -91,6 +91,7 @@ This outline is designed for a 10–12 slide B.Tech CSE project defense. Present
 - Candidate on 15k evaluation rows (162 fraud): precision 0.993671, recall 0.969136, F1 0.981250, threshold 0.76.
 - V2 on the same rows: precision 1.000000, recall 0.993827, F1 0.996904, threshold 0.53.
 - The candidate is labeled demonstration-only and ineligible for genuine promotion; no promotion occurred.
+- A separate controlled drift simulation generates labels from an explicit XOR rule, flags 31/34 features in its latest saved run, and reports a candidate recommendation only within that synthetic experiment. It does not show real-world model superiority or activate a model; see [DRIFT_SIMULATION.md](DRIFT_SIMULATION.md).
 
 **Suggested visual:** Same-sample comparison table plus a locked “promotion blocked” badge.
 
@@ -110,6 +111,8 @@ This outline is designed for a 10–12 slide B.Tech CSE project defense. Present
 - Next: authorized genuine label integration, representative evaluation, calibrated alert/promotion policy, distributed account state, and controlled live testing.
 
 **Suggested visual:** Current prototype → verified data → reviewed candidate → controlled deployment roadmap.
+
+> **Current UI note (2026-11-01):** The grouped admin navigation now uses the page label **Pipeline Evidence** (formerly shown in older notes as Live Monitoring). Retraining Lab is not in active navigation; Model Orchestrator shows the blocked real-candidate state and a separate simulation action.
 
 ## Viva questions and answers
 

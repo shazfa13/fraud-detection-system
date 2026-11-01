@@ -1,0 +1,217 @@
+{
+  "run_id": "20261028T102955Z_1512e4dd",
+  "rows": [
+    {
+      "evaluation_cohort": "historical_test",
+      "model_name": "V2",
+      "model_version": "V2",
+      "threshold": 0.53,
+      "accuracy": 0.9999779764788794,
+      "precision": 0.998467824310521,
+      "recall": 0.9994887525562373,
+      "f1": 0.9989780275932549,
+      "pr_auc": 0.9994901150829729,
+      "roc_auc": 0.9996823412717654,
+      "tn": 179665,
+      "fp": 3,
+      "fn": 1,
+      "tp": 1955,
+      "samples": 181624,
+      "fraud_prevalence": 0.010769501827952253,
+      "combined_accuracy": 0.9999806411646275
+    },
+    {
+      "evaluation_cohort": "historical_test",
+      "model_name": "Simulation candidate",
+      "model_version": "simulation_candidate",
+      "threshold": 0.55,
+      "accuracy": 0.9999669647183191,
+      "precision": 1.0,
+      "recall": 0.9969325153374233,
+      "f1": 0.9984639016897081,
+      "pr_auc": 0.9994871667090602,
+      "roc_auc": 0.9996327070065566,
+      "tn": 179668,
+      "fp": 0,
+      "fn": 6,
+      "tp": 1950,
+      "samples": 181624,
+      "fraud_prevalence": 0.010769501827952253,
+      "combined_accuracy": 0.9999709617469413
+    },
+    {
+      "evaluation_cohort": "synthetic_test",
+      "model_name": "V2",
+      "model_version": "V2",
+      "threshold": 0.53,
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "pr_auc": 1.0,
+      "roc_auc": 1.0,
+      "tn": 24492,
+      "fp": 0,
+      "fn": 0,
+      "tp": 508,
+      "samples": 25000,
+      "fraud_prevalence": 0.02032,
+      "combined_accuracy": 0.9999806411646275
+    },
+    {
+      "evaluation_cohort": "synthetic_test",
+      "model_name": "Simulation candidate",
+      "model_version": "simulation_candidate",
+      "threshold": 0.55,
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "pr_auc": 1.0,
+      "roc_auc": 1.0,
+      "tn": 24492,
+      "fp": 0,
+      "fn": 0,
+      "tp": 508,
+      "samples": 25000,
+      "fraud_prevalence": 0.02032,
+      "combined_accuracy": 0.9999709617469413
+    }
+  ],
+  "metric_deltas": [
+    {
+      "evaluation_cohort": "historical_test",
+      "metric": "accuracy",
+      "V2": 0.9999779764788794,
+      "candidate": 0.9999669647183191,
+      "candidate_minus_V2": -1.1011760560286632e-05
+    },
+    {
+      "evaluation_cohort": "historical_test",
+      "metric": "precision",
+      "V2": 0.998467824310521,
+      "candidate": 1.0,
+      "candidate_minus_V2": 0.001532175689479054
+    },
+    {
+      "evaluation_cohort": "historical_test",
+      "metric": "recall",
+      "V2": 0.9994887525562373,
+      "candidate": 0.9969325153374233,
+      "candidate_minus_V2": -0.002556237218813928
+    },
+    {
+      "evaluation_cohort": "historical_test",
+      "metric": "f1",
+      "V2": 0.9989780275932549,
+      "candidate": 0.9984639016897081,
+      "candidate_minus_V2": -0.0005141259035468249
+    },
+    {
+      "evaluation_cohort": "historical_test",
+      "metric": "pr_auc",
+      "V2": 0.9994901150829729,
+      "candidate": 0.9994871667090602,
+      "candidate_minus_V2": -2.9483739126812125e-06
+    },
+    {
+      "evaluation_cohort": "historical_test",
+      "metric": "roc_auc",
+      "V2": 0.9996823412717654,
+      "candidate": 0.9996327070065566,
+      "candidate_minus_V2": -4.963426520876446e-05
+    },
+    {
+      "evaluation_cohort": "historical_test",
+      "metric": "fp",
+      "V2": 3,
+      "candidate": 0,
+      "candidate_minus_V2": -3
+    },
+    {
+      "evaluation_cohort": "historical_test",
+      "metric": "fn",
+      "V2": 1,
+      "candidate": 6,
+      "candidate_minus_V2": 5
+    },
+    {
+      "evaluation_cohort": "synthetic_test",
+      "metric": "accuracy",
+      "V2": 1.0,
+      "candidate": 1.0,
+      "candidate_minus_V2": 0.0
+    },
+    {
+      "evaluation_cohort": "synthetic_test",
+      "metric": "precision",
+      "V2": 1.0,
+      "candidate": 1.0,
+      "candidate_minus_V2": 0.0
+    },
+    {
+      "evaluation_cohort": "synthetic_test",
+      "metric": "recall",
+      "V2": 1.0,
+      "candidate": 1.0,
+      "candidate_minus_V2": 0.0
+    },
+    {
+      "evaluation_cohort": "synthetic_test",
+      "metric": "f1",
+      "V2": 1.0,
+      "candidate": 1.0,
+      "candidate_minus_V2": 0.0
+    },
+    {
+      "evaluation_cohort": "synthetic_test",
+      "metric": "pr_auc",
+      "V2": 1.0,
+      "candidate": 1.0,
+      "candidate_minus_V2": 0.0
+    },
+    {
+      "evaluation_cohort": "synthetic_test",
+      "metric": "roc_auc",
+      "V2": 1.0,
+      "candidate": 1.0,
+      "candidate_minus_V2": 0.0
+    },
+    {
+      "evaluation_cohort": "synthetic_test",
+      "metric": "fp",
+      "V2": 0,
+      "candidate": 0,
+      "candidate_minus_V2": 0
+    },
+    {
+      "evaluation_cohort": "synthetic_test",
+      "metric": "fn",
+      "V2": 0,
+      "candidate": 0,
+      "candidate_minus_V2": 0
+    },
+    {
+      "evaluation_cohort": "combined",
+      "metric": "accuracy",
+      "V2": 0.9999806411646275,
+      "candidate": 0.9999709617469413,
+      "candidate_minus_V2": -9.679417686148106e-06
+    }
+  ],
+  "recommendation": "CONTINUE_WITH_V2",
+  "criteria": {
+    "valid_metrics_and_matched_cohort_sample_counts": true,
+    "candidate_combined_accuracy_strictly_greater_than_v2": false,
+    "continue_with_v2_accuracy_greater_than_or_equal_to_candidate": true
+  },
+  "combined_accuracy": {
+    "V2": 0.9999806411646275,
+    "candidate": 0.9999709617469413,
+    "candidate_minus_V2": -9.679417686148106e-06,
+    "V2_correct": 206620,
+    "candidate_correct": 206618,
+    "total_samples": 206624
+  },
+  "decision_rule": "SWITCH_TO_NEW_MODEL only when candidate combined accuracy is strictly greater than V2; otherwise CONTINUE_WITH_V2."
+}

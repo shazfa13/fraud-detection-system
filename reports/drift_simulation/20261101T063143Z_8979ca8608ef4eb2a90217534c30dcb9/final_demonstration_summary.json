@@ -1,0 +1,53 @@
+{
+  "run_id": "20261101T063143Z_8979ca8608ef4eb2a90217534c30dcb9",
+  "execution_type": "SIMULATION_ONLY",
+  "drift_detected": true,
+  "drifted_features": 31,
+  "tested_features": 34,
+  "real_orchestrator_decision": "BLOCKED",
+  "v2_metrics": {
+    "precision": 0.5495049504950495,
+    "recall": 0.033278369060110925,
+    "f1": 0.06275618374558303,
+    "pr_auc": 0.3632622804244034,
+    "roc_auc": 0.5095218717781675,
+    "accuracy": 0.66845,
+    "tp": 222,
+    "tn": 13147,
+    "fp": 182,
+    "fn": 6449,
+    "rows": 20000,
+    "fraud_count": 6671,
+    "fraud_rate": 0.33355,
+    "threshold": 0.53
+  },
+  "candidate_metrics": {
+    "precision": 0.998951624981279,
+    "recall": 0.9998500974366662,
+    "f1": 0.9994006592747977,
+    "pr_auc": 0.9999872335774793,
+    "roc_auc": 0.999993713291852,
+    "accuracy": 0.9996,
+    "tp": 6670,
+    "tn": 13322,
+    "fp": 7,
+    "fn": 1,
+    "rows": 20000,
+    "fraud_count": 6671,
+    "fraud_rate": 0.33355,
+    "threshold": 0.32
+  },
+  "recommendation": "CANDIDATE_RECOMMENDED_FOR_REVIEW",
+  "active_model": "V2",
+  "v2_hashes_unchanged": {
+    "model": true,
+    "metadata": true,
+    "threshold": true
+  },
+  "candidate_saved_separately": true,
+  "real_orchestrator_runs_unchanged": true,
+  "automatic_promotion": "NO",
+  "real_verified_labels_used": "NO",
+  "candidate_path": "models/drift_simulation/20261101T063143Z_8979ca8608ef4eb2a90217534c30dcb9/simulation_candidate.json",
+  "report_directory": "reports/drift_simulation/20261101T063143Z_8979ca8608ef4eb2a90217534c30dcb9"
+}

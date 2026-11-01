@@ -69,7 +69,7 @@ python -m src.labels.cli stats
 
 The same submission endpoint is `POST /labels`; it accepts JSON fields `transaction_id`, `outcome` (`fraud` or `legitimate`), `label_source`, `source_type`, `confirmed_at` (timezone-aware ISO-8601), and `submission_id`. Authorized `trusted_verified` requests must also send `X-Label-Token` with the configured secret.
 
-The Streaming Monitor shows registry counts but does not present them as model accuracy. Keep the label API terminal open while submitting labels; Ctrl+C stops it. The Kafka and Spark terminals remain independent processes. The shared token and local SQLite file are single-machine development controls, not production-grade multi-user authentication or distributed storage.
+The Pipeline Evidence page shows registry counts but does not present them as model accuracy. Keep the label API terminal open while submitting labels; Ctrl+C stops it. The Kafka and Spark terminals remain independent processes. The shared token and local SQLite file are single-machine development controls, not production-grade multi-user authentication or distributed storage.
 
 ## Verification — 2026-10-25
 

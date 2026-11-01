@@ -1,0 +1,218 @@
+{
+  "run_id": "20261028T164605Z_c85801ef",
+  "rows": [
+    {
+      "evaluation_cohort": "historical_test",
+      "model_name": "V2",
+      "model_version": "V2",
+      "threshold": 0.53,
+      "accuracy": 0.9999779764788794,
+      "precision": 0.998467824310521,
+      "recall": 0.9994887525562373,
+      "f1": 0.9989780275932549,
+      "pr_auc": 0.9994901150829729,
+      "roc_auc": 0.9996823412717654,
+      "tn": 179665,
+      "fp": 3,
+      "fn": 1,
+      "tp": 1955,
+      "samples": 181624,
+      "fraud_prevalence": 0.010769501827952253,
+      "combined_accuracy": 0.9999758014557845
+    },
+    {
+      "evaluation_cohort": "historical_test",
+      "model_name": "Simulation candidate",
+      "model_version": "simulation_candidate",
+      "threshold": 0.57,
+      "accuracy": 0.9999669647183191,
+      "precision": 1.0,
+      "recall": 0.9969325153374233,
+      "f1": 0.9984639016897081,
+      "pr_auc": 0.9994871672539853,
+      "roc_auc": 0.9996326813969487,
+      "tn": 179668,
+      "fp": 0,
+      "fn": 6,
+      "tp": 1950,
+      "samples": 181624,
+      "fraud_prevalence": 0.010769501827952253,
+      "combined_accuracy": 0.9999661220380982
+    },
+    {
+      "evaluation_cohort": "synthetic_test",
+      "model_name": "V2",
+      "model_version": "V2",
+      "threshold": 0.53,
+      "accuracy": 0.99996,
+      "precision": 0.9980952380952381,
+      "recall": 1.0,
+      "f1": 0.9990467111534795,
+      "pr_auc": 0.9999854598327881,
+      "roc_auc": 0.9999998440597364,
+      "tn": 24475,
+      "fp": 1,
+      "fn": 0,
+      "tp": 524,
+      "samples": 25000,
+      "fraud_prevalence": 0.02096,
+      "combined_accuracy": 0.9999758014557845
+    },
+    {
+      "evaluation_cohort": "synthetic_test",
+      "model_name": "Simulation candidate",
+      "model_version": "simulation_candidate",
+      "threshold": 0.57,
+      "accuracy": 0.99996,
+      "precision": 1.0,
+      "recall": 0.9980916030534351,
+      "f1": 0.9990448901623686,
+      "pr_auc": 0.9999927437378457,
+      "roc_auc": 0.9999998440597363,
+      "tn": 24476,
+      "fp": 0,
+      "fn": 1,
+      "tp": 523,
+      "samples": 25000,
+      "fraud_prevalence": 0.02096,
+      "combined_accuracy": 0.9999661220380982
+    }
+  ],
+  "metric_deltas": [
+    {
+      "evaluation_cohort": "historical_test",
+      "metric": "accuracy",
+      "V2": 0.9999779764788794,
+      "candidate": 0.9999669647183191,
+      "candidate_minus_V2": -1.1011760560286632e-05
+    },
+    {
+      "evaluation_cohort": "historical_test",
+      "metric": "precision",
+      "V2": 0.998467824310521,
+      "candidate": 1.0,
+      "candidate_minus_V2": 0.001532175689479054
+    },
+    {
+      "evaluation_cohort": "historical_test",
+      "metric": "recall",
+      "V2": 0.9994887525562373,
+      "candidate": 0.9969325153374233,
+      "candidate_minus_V2": -0.002556237218813928
+    },
+    {
+      "evaluation_cohort": "historical_test",
+      "metric": "f1",
+      "V2": 0.9989780275932549,
+      "candidate": 0.9984639016897081,
+      "candidate_minus_V2": -0.0005141259035468249
+    },
+    {
+      "evaluation_cohort": "historical_test",
+      "metric": "pr_auc",
+      "V2": 0.9994901150829729,
+      "candidate": 0.9994871672539853,
+      "candidate_minus_V2": -2.947828987576173e-06
+    },
+    {
+      "evaluation_cohort": "historical_test",
+      "metric": "roc_auc",
+      "V2": 0.9996823412717654,
+      "candidate": 0.9996326813969487,
+      "candidate_minus_V2": -4.9659874816643246e-05
+    },
+    {
+      "evaluation_cohort": "historical_test",
+      "metric": "fp",
+      "V2": 3,
+      "candidate": 0,
+      "candidate_minus_V2": -3
+    },
+    {
+      "evaluation_cohort": "historical_test",
+      "metric": "fn",
+      "V2": 1,
+      "candidate": 6,
+      "candidate_minus_V2": 5
+    },
+    {
+      "evaluation_cohort": "synthetic_test",
+      "metric": "accuracy",
+      "V2": 0.99996,
+      "candidate": 0.99996,
+      "candidate_minus_V2": 0.0
+    },
+    {
+      "evaluation_cohort": "synthetic_test",
+      "metric": "precision",
+      "V2": 0.9980952380952381,
+      "candidate": 1.0,
+      "candidate_minus_V2": 0.0019047619047618536
+    },
+    {
+      "evaluation_cohort": "synthetic_test",
+      "metric": "recall",
+      "V2": 1.0,
+      "candidate": 0.9980916030534351,
+      "candidate_minus_V2": -0.001908396946564861
+    },
+    {
+      "evaluation_cohort": "synthetic_test",
+      "metric": "f1",
+      "V2": 0.9990467111534795,
+      "candidate": 0.9990448901623686,
+      "candidate_minus_V2": -1.8209911109012822e-06
+    },
+    {
+      "evaluation_cohort": "synthetic_test",
+      "metric": "pr_auc",
+      "V2": 0.9999854598327881,
+      "candidate": 0.9999927437378457,
+      "candidate_minus_V2": 7.283905057664519e-06
+    },
+    {
+      "evaluation_cohort": "synthetic_test",
+      "metric": "roc_auc",
+      "V2": 0.9999998440597364,
+      "candidate": 0.9999998440597363,
+      "candidate_minus_V2": -1.1102230246251565e-16
+    },
+    {
+      "evaluation_cohort": "synthetic_test",
+      "metric": "fp",
+      "V2": 1,
+      "candidate": 0,
+      "candidate_minus_V2": -1
+    },
+    {
+      "evaluation_cohort": "synthetic_test",
+      "metric": "fn",
+      "V2": 0,
+      "candidate": 1,
+      "candidate_minus_V2": 1
+    },
+    {
+      "evaluation_cohort": "combined",
+      "metric": "accuracy",
+      "V2": 0.9999758014557845,
+      "candidate": 0.9999661220380982,
+      "candidate_minus_V2": -9.679417686259129e-06
+    }
+  ],
+  "recommendation": "CONTINUE_WITH_V2",
+  "combined_accuracy": {
+    "V2": 0.9999758014557845,
+    "candidate": 0.9999661220380982,
+    "candidate_minus_V2": -9.679417686259129e-06,
+    "V2_correct": 206619,
+    "candidate_correct": 206617,
+    "total_samples": 206624
+  },
+  "criteria": {
+    "valid_predictions_and_matched_test_rows": true,
+    "candidate_combined_accuracy_strictly_greater_than_v2": false,
+    "continue_with_v2_accuracy_greater_than_or_equal_to_candidate": true
+  },
+  "decision_rule": "SWITCH_TO_NEW_MODEL only when candidate combined accuracy is strictly greater than V2; otherwise CONTINUE_WITH_V2.",
+  "trade_off_warning": "Candidate increases in false negatives or decreases in recall are displayed prominently and do not change the accuracy-based choice."
+}

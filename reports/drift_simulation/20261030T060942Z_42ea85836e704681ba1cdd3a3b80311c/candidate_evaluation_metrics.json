@@ -1,0 +1,50 @@
+{
+  "run_id": "20261030T060942Z_42ea85836e704681ba1cdd3a3b80311c",
+  "status": "COMPLETED",
+  "execution_type": "SIMULATION_ONLY",
+  "test_rows": 20000,
+  "test_simulated_positives": 6671,
+  "test_feature_fingerprint": "9dd555f7b241302fbaaee10fd04900a33532dec8ba634e0ca58fdb4fa47698f6",
+  "test_event_id_fingerprint": "2d45e8c9032ffb6270a70f9dbaf073ba4978a0c90fff72abde0b10fea224c35c",
+  "identical_test_rows": true,
+  "test_used_for_fit_or_threshold": false,
+  "labels_simulated": true,
+  "thresholds": {
+    "V2": 0.53,
+    "candidate_validation_selected": 0.32
+  },
+  "metrics": {
+    "V2": {
+      "precision": 0.5495049504950495,
+      "recall": 0.033278369060110925,
+      "f1": 0.06275618374558303,
+      "pr_auc": 0.3632622804244034,
+      "roc_auc": 0.5095218717781675,
+      "accuracy": 0.66845,
+      "tp": 222,
+      "tn": 13147,
+      "fp": 182,
+      "fn": 6449,
+      "rows": 20000,
+      "fraud_count": 6671,
+      "fraud_rate": 0.33355,
+      "threshold": 0.53
+    },
+    "candidate": {
+      "precision": 0.998951624981279,
+      "recall": 0.9998500974366662,
+      "f1": 0.9994006592747977,
+      "pr_auc": 0.9999872335774793,
+      "roc_auc": 0.999993713291852,
+      "accuracy": 0.9996,
+      "tp": 6670,
+      "tn": 13322,
+      "fp": 7,
+      "fn": 1,
+      "rows": 20000,
+      "fraud_count": 6671,
+      "fraud_rate": 0.33355,
+      "threshold": 0.32
+    }
+  }
+}

@@ -1,106 +1,66 @@
-# Project Demonstration Script
+# Project demonstration script
 
-This sequence demonstrates the actual Streamlit UI and saved evidence without starting Kafka/Spark or running retraining. The workspace currently has user-created persistent streaming/database outputs; avoid mutating those during a presentation unless new writes are intentional.
+This walkthrough uses the current role-based Streamlit navigation and saved evidence. Start FastAPI only if you intend to exercise transaction preview/prediction. Kafka/Spark and monitoring are optional, separate services. A prediction, producer run, label submission, or monitor invocation persists state; use preview and saved reports for a non-mutating talk.
 
 ## Before the presentation
 
-Use PowerShell, from the project root:
+From the repository root in PowerShell:
 
 ```powershell
-Set-Location D:\fraud-detection-system\fraud-detection-system
-.\venv\Scripts\Activate.ps1
+.\venv\Scripts\python.exe -m streamlit run dashboard.py
 ```
 
-The optional UI dependency is declared in `requirements-ui.txt`. It was not installed or changed during this audit. If Streamlit is already available, start the UI in its own terminal:
+The UI requires `requirements-ui.txt`. Configure an admin username/hash as documented in [DASHBOARD_README.md](../DASHBOARD_README.md), then select Admin sign-in. To run FastAPI separately (needed by Transaction Risk Check and Analyzer):
 
 ```powershell
-streamlit run dashboard.py
-```
-
-The dashboard defaults to `http://127.0.0.1:8000` for FastAPI. Check `FRAUD_API_BASE_URL` if your API uses another port. To run the existing API in a separate terminal and isolate any Analyzer prediction log from the repository, use:
-
-```powershell
-Set-Location D:\fraud-detection-system\fraud-detection-system
-.\venv\Scripts\Activate.ps1
+$env:FRAUD_ACTIVE_MODEL_VERSION = 'v2'
 $env:FRAUD_PREDICTION_LOG_PATH = Join-Path $env:TEMP ('fraud-demo-' + [guid]::NewGuid().ToString('N') + '.jsonl')
-python -m uvicorn src.api.app:app --host 127.0.0.1 --port 8000
+.\venv\Scripts\python.exe -m uvicorn src.api.app:app --host 127.0.0.1 --port 8000
 ```
 
-In a third terminal, check API health:
+Check `http://127.0.0.1:8000/health`. Expected model selection in this workspace is V2, 34 features, threshold 0.53; an activation manifest or environment override can change the resolved bundle. Uvicorn is not listed in `requirements.txt`; verify it is installed in the chosen environment before launch.
 
-```powershell
-Invoke-RestMethod http://127.0.0.1:8000/health
-```
+## Suggested admin walkthrough
 
-Expected fields: `status`, `model_loaded`, `model_version`, `feature_count` (34), and `threshold` (resolver-selected; expected V2/.53 with current configuration). The venv's historical runbook records Uvicorn available, but the dependency file does not declare it; if this fresh command fails, use the existing environment setup documented in `docs/DEMO_RUNBOOK.md`.
-
-### Optional streaming demonstration
-
-Only do this when Kafka is already installed/configured and you intentionally want to append new synthetic events, predictions, Stage 2 rows, and checkpoints. The repository does not include Kafka broker scripts, so use the existing local installation and existing KRaft configuration; do not format storage, delete/recreate topics, or reuse a checkpoint with a second consumer.
-
-1. Start the existing Kafka broker and verify topic `fraud-transactions` on `127.0.0.1:9092`, exactly one partition.
-2. Start one Spark consumer in its own terminal:
-
-   ```powershell
-   Set-Location D:\fraud-detection-system\fraud-detection-system
-   .\venv\Scripts\Activate.ps1
-   python -m src.streaming.stage1_streaming
-   ```
-
-3. Only if you intend a continuous synthetic replay, start the producer in another terminal:
-
-   ```powershell
-   Set-Location D:\fraud-detection-system\fraud-detection-system
-   .\venv\Scripts\Activate.ps1
-   python -m src.streaming.stage1_producer --delay 2
-   ```
-
-The producer loops forever over a finite held-out PaySim slice, assigning fresh synthetic IDs; it does not create new real transactions. Stop producer, Spark, and broker with Ctrl+C in their own terminals. Keep topic and checkpoint intact. Kafka/Spark were not live-tested in this documentation task.
-
-## Recommended sidebar order and speaking notes
-
-1. **Overview.** Point to registry counts, resolver-selected model, recent saved activity, and cached API health. Say: “Counts are saved model decisions, and prediction classes are not confirmed outcomes.” Current saved count at audit: 2,228; all class 0. Historical Phase 12 evidence is not a current broker status.
-2. **Transaction Analyzer — preview.** Enter this schema-valid synthetic illustration:
+1. **Admin Overview:** explain that counts are saved classifier decisions, and historical evidence is distinct from the cached FastAPI health check.
+2. **Transaction Analyzer:** choose **Preview only** and use the synthetic illustration below. It does not add the current event to history.
 
    ```text
    Step: 5
-   Transaction type: TRANSFER
-   Amount: 1500.0
-   Origin account: C1234567890
-   Origin balance before: 5000.0
-   Destination account: C9876543210
-   Destination balance before: 0.0
-   Action: Preview only
+   Type: TRANSFER
+   Amount: 1500.00
+   Sender reference: DEMO-SENDER-1
+   Sender balance before: 5000.00
+   Receiver reference: DEMO-RECEIVER-1
+   Receiver balance before: 0.00
    ```
 
-   Click **Run selected action**. Show the ordered 34-feature vector. Say: “The request carries seven transaction-time fields; the API derives model features. This is synthetic input for the demo, not a real customer transaction.” Do not include `isFraud`.
+   The API constructs the 34 model features. Never send `isFraud` to a prediction endpoint.
+3. **Transaction Explorer:** show search/filter/export over saved outputs. A class-1 result means predicted class 1, not confirmed fraud.
+4. **Counterfactual Explainability:** if the processed Parquet data is available, use an exact event ID to show a fresh resolver-based score, optional SHAP contribution view and approximate bounded hypothetical change. State that neither proves cause.
+5. **Pipeline Evidence:** show persisted Stage 1/2/3 and historical integration records. Explain that a heartbeat is not a broker health check and the page does not start services.
+6. **Drift & Alerts / Delayed Labels:** explain that drift is feature-distribution evidence, while retraining eligibility requires provenance-verified genuine labels.
+7. **Model Performance:** present the saved same-split V1/V2 evaluation only as synthetic PaySim benchmark results. V2's 0.53 threshold test metrics are precision 0.998468, recall 0.999489, F1 0.998978, PR-AUC 0.999490, ROC-AUC 0.999682 on 181,624 rows with 1,956 fraud labels.
+8. **Model Orchestrator:** show that current real candidate creation is blocked and no real run is present. The explicit simulation action is separate and writes new synthetic artifacts; use saved reports if you do not want writes.
+9. **System Health, System Architecture, Reports & Documentation:** distinguish API/resolver/file status from Kafka/Spark and use saved reference files as needed.
 
-3. **Transaction Analyzer — optional prediction.** For a prediction, select **Submit prediction** and click Run selected action. Show class, probability, risk score, level, model. Say: “This is the model's score, not an investigation result.” This action updates process-local account history and writes to the API log; use the temp log above. Probability/class may change with state/model version. No class is guaranteed.
+The current admin groups are Dashboard; Transactions; Monitoring & Data Quality; Model Lifecycle; Project Reference. The page previously called Live Monitoring is currently **Pipeline Evidence**. Retraining Lab is not in active navigation.
 
-4. **Live Monitoring.** Show Stage 1 heartbeat freshness, Stage 2 totals, Stage 3 persisted report, and Phase 12 evidence. At audit time the heartbeat was stale (more than the 30-second window), although the status file said running; the Stage 3 report was historical Oct 25 evidence with 31/34 features drifted and no eligible labels. Say: “This screen reads files and saved monitor state. It does not poll Kafka or Spark.”
+## Optional streaming demonstration
 
-5. **Transaction Explorer.** To show a saved class-1 output, choose Predicted class `1` and Model version `V2`. The audited V2 log has a historical result at `2026-10-19T07:23:39.313398+00:00`, probability `0.570683`, score `57.0683`, MEDIUM. The record has no transaction ID/type/amount; explicitly call it a saved model prediction, not confirmed fraud. To show a saved class-0 example, search `PHASE12-20261019075835` to inspect the historical V2 integration row if present. Download action is optional and only downloads the filtered view. Say: “These are logged predictions; source overlap is retained and no ground truth is inferred.”
+Only present an active stream if a Kafka broker is already configured, the `fraud-transactions` topic has one partition, Java/Spark and the connector are available, and new persistent writes are intended. Follow [STAGE1_STREAMING.md](STAGE1_STREAMING.md) and [DEMO_RUNBOOK.md](DEMO_RUNBOOK.md). The producer repeats a finite held-out PaySim slice with synthetic IDs. It does not create new real transactions. Never start a second consumer on `checkpoints/stage1_kafka_spark`.
 
-6. **Model Performance.** Show V1/V2 historical held-out comparison. Point out V2 at .53 achieved saved precision .998468, recall .999489, F1 .998978 on 181,624 synthetic PaySim test rows; one false negative and three false positives. Say: “These are offline synthetic test metrics, not live stream accuracy.”
+## Demonstrating prediction versus outcome
 
-7. **Drift & Alerts.** Show persisted drift rate 31/34 (91.18%) against 15%, report timestamp, alert, and insufficient-label result. Say: “This is a saved synthetic-window shift signal; drift is not proof of fraud, and the monitor did not train a model.” Do not run the monitoring CLI during the presentation; it writes SQLite state.
+The prediction API does not establish an outcome. Historical model metrics compare classifications with PaySim's synthetic `isFraud` target. Stage 2 is the later-label audit path, but the inspected setup has no configured trusted source and no eligible genuine labels. Do not call PaySim labels or generated simulation labels genuine investigation results.
 
-8. **Delayed Labels.** Show 2,227 unresolved predictions, 0 genuine labels, and 1 synthetic test label. Say: “The delayed-label path records provenance; synthetic labels cannot be used for genuine retraining.” Do not start the label API or submit a label; its startup and submissions persist data.
+## Side effects to avoid during a routine talk
 
-9. **Retraining Lab.** Show the minimum 100 labels/10 fraud gate, current blocked status, and Stage 6 saved demo candidate ineligible for genuine promotion. Say: “The candidate run proves a bounded synthetic training demo only. Genuine retraining is blocked by verified label requirements.” Do not run `--train`, promotion, or rollback commands.
+- **Analyzer Submit prediction / user analysis:** writes account history and an API JSONL record; use the temporary log above if intentionally demonstrated.
+- **Stage 1 producer/consumer:** publishes messages, appends outputs, updates the registry and advances the checkpoint.
+- **Stage 2 label API/submission:** initializes or writes SQLite state.
+- **Monitoring CLI:** persists a new run, alerts and requests.
+- **Orchestrator simulation:** writes a new candidate and report set under its isolated simulation directories.
+- **Promotion/rollback:** changes active manifest state and is not part of this presentation walkthrough.
 
-10. **System Architecture.** Trace API / Stage 1 → feature builder → shared model resolver → outputs; then labels → monitoring → guarded retraining handoff. Say: “Drift requests review; it does not automatically retrain or deploy.”
-
-11. **Reports & Documentation / System Health.** Download a saved report if useful. Finish at System Health: show the actual `/health` response if available, the resolver-selected model and artifact presence. Say: “Health reports FastAPI only. Kafka and Spark are not probed here.”
-
-## Demonstrating confirmed versus predicted fraud
-
-The Analyzer cannot establish a confirmed outcome. V1/V2 report metrics compare predictions with known `isFraud` labels on synthetic historical test partitions. Delayed labels are the mechanism for later outcomes, but current Stage 2 has no trusted genuine source configured and its one label is synthetic. Do not relabel the Phase 12 class-0 example as legitimate ground truth; it is only a predicted class. If you want to show the historical record, it contains `step=379`, `type=PAYMENT`, `amount=4349.85`, V2 probability approximately .4293, class 0, risk level MEDIUM. The CSV lacks account identifiers and pre-transaction balances, so it is not a complete Analyzer input.
-
-## What is safe and what writes state
-
-Safe, read-only UI actions: navigate, refresh cached dashboard values, expand saved sections, filter/search/sort Explorer, download report/filtered data, use Analyzer **Preview only**. Prediction action writes the configured API JSONL and changes that API process's in-memory account state. Starting Kafka/Spark producer/consumer writes logs, Stage 2 registration, offsets/checkpoint; continuous producer publishes synthetic messages indefinitely. Stage 2 API initializes/writes SQLite. Monitoring CLI persists monitor runs/alerts. Stage 6 training writes candidate artifacts; Stage 5 promotion/rollback changes model activation state. Keep these out of a routine talk.
-
-## Backup plan
-
-If FastAPI is unavailable, skip live Analyzer response and show the saved Phase 12 row and `/health` schema in the code/runbook; label both as historical/code contract. Use `Preview only` only when API is responding. If Kafka/Spark is unavailable, do not claim a live stream: show saved Stage 1 records, stale heartbeat, and historical Phase 12 PASS evidence with timestamps. Continue through model metrics, drift, delayed labels, and lifecycle pages, which read local reports/databases. If the UI itself is unavailable, use these Markdown guides and saved CSV/JSON evidence via PowerShell `Get-Content` or `Import-Csv`; do not try to repair it by clearing data or resetting Kafka.
+For a current code/artifact overview, see [the UI guide](UI_USER_GUIDE.md), [project workflow](PROJECT_WORKFLOW.md), [results](PROJECT_RESULTS_AND_LIMITATIONS.md), and [simulation details](DRIFT_SIMULATION.md).

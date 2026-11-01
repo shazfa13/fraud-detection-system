@@ -1,0 +1,68 @@
+{
+  "run_id": "20261028T102955Z_1512e4dd",
+  "seed": 20261028,
+  "source_dataset": "data\\processed\\v2_retraining_dataset.parquet",
+  "source_sha256": "e50ab9b49f409c88cd97b141b2acef733ee2480fd52f365a06136e38953a8f14",
+  "method": "weighted bootstrap of complete historical rows with replacement",
+  "selection_covariates": [
+    "amount >= source 90th percentile",
+    "type_TRANSFER",
+    "type_CASH_OUT"
+  ],
+  "selected_strength": 2.0,
+  "strength_attempts": [
+    {
+      "attempt": 1,
+      "strength": 2.0,
+      "drifted": 29,
+      "monitored": 30,
+      "drift_rate": 0.9666666666666667
+    }
+  ],
+  "synthetic_train_rows": 25000,
+  "synthetic_test_csv_rows": 25000,
+  "csv_path": "data\\drift_simulation\\synthetic_drift_data.csv",
+  "label_policy": "isFraud copied exactly from each source PaySim row; inherited simulator labels, not independently verified outcomes",
+  "model_features": [
+    "hour_of_day",
+    "amount",
+    "log_amount",
+    "is_large_amount",
+    "amount_to_sender_balance_ratio",
+    "amount_ge_sender_balance",
+    "sender_remaining_if_debited",
+    "amount_to_dest_balance_ratio",
+    "sender_balance_before",
+    "sender_balance_zero_before",
+    "dest_balance_before",
+    "dest_balance_zero_before",
+    "sender_prev_txn_count",
+    "sender_prev_total_amount",
+    "sender_prev_mean_amount",
+    "sender_prev_max_amount",
+    "dest_prev_txn_count",
+    "dest_prev_total_amount",
+    "dest_prev_mean_amount",
+    "dest_prev_max_amount",
+    "amount_vs_sender_hist_mean",
+    "amount_vs_dest_hist_mean",
+    "sender_hours_since_prev_txn",
+    "dest_hours_since_prev_txn",
+    "dest_txn_count_last_1h",
+    "dest_txn_count_last_24h",
+    "dest_txn_count_last_168h",
+    "dest_amount_sum_last_24h",
+    "dest_amount_sum_last_168h",
+    "type_CASH_IN",
+    "type_CASH_OUT",
+    "type_DEBIT",
+    "type_PAYMENT",
+    "type_TRANSFER"
+  ],
+  "audit_columns": [
+    "event_id",
+    "step"
+  ],
+  "target": "isFraud",
+  "output_path": "data\\drift_simulation\\synthetic_drift_data.csv"
+}

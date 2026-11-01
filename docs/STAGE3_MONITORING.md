@@ -69,8 +69,7 @@ From the project root with the project virtual environment:
 ```
 
 The CLI prints one JSON report and writes restart-safe records to the Stage 3 database. It does
-not initialize or write the Stage 2 database. The dashboard's Streaming Monitor page reads the
-latest persisted report and shows the model, threshold, drift/performance states, verified sample,
+not initialize or write the Stage 2 database. The dashboard's Drift & Alerts and Pipeline Evidence pages expose the latest persisted report, including model/threshold, drift and performance states, verified sample,
 alerts, and request status. A missing report is normal until the command has run once.
 
 ## Tests and limitations

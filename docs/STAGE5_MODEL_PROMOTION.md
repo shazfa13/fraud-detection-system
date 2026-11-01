@@ -1,8 +1,8 @@
 # Stage 5: Candidate validation, promotion, and rollback
 
-Stage 5 never trains. Stage 4 remains the only training workflow and currently
-reports that there are no eligible genuine verified labels. Synthetic fixtures
-are for code-path tests only, not production performance evidence.
+This guide documents the original Stage 5 command-line validation, promotion, and rollback workflow. Candidate training is also implemented in the newer `src/orchestrator/training.py` package, which has separate isolated run records. The Model Orchestrator page currently disables real candidate start, and genuine-label requirements block training in the inspected workspace. Synthetic fixtures and simulation candidates are not genuine performance evidence.
+
+> **Current status (2026-11-01):** The shared resolver selects V2 at threshold 0.53 because no activation manifest is present. No candidate has been promoted in the inspected workspace. The newer orchestrator has decision/promotion safeguards, but no real orchestrator run exists and its UI training action is disabled while readiness is blocked. Stage 6 and drift-simulation candidates remain ineligible for genuine promotion. See [project workflow](PROJECT_WORKFLOW.md) and [simulation results](DRIFT_SIMULATION.md).
 
 ## Shared active-model resolution
 

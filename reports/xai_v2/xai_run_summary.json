@@ -1,0 +1,70 @@
+{
+  "model_version": "V2",
+  "model_artifact_path": "models\\xgboost_model_v2.json",
+  "model_artifact_sha256": "0e2ea322d0f16d918cd42e27bbd98af485e9b03b8ef0142b5067e43cbf4ab89e",
+  "feature_count": 34,
+  "feature_order": [
+    "hour_of_day",
+    "amount",
+    "log_amount",
+    "is_large_amount",
+    "amount_to_sender_balance_ratio",
+    "amount_ge_sender_balance",
+    "sender_remaining_if_debited",
+    "amount_to_dest_balance_ratio",
+    "sender_balance_before",
+    "sender_balance_zero_before",
+    "dest_balance_before",
+    "dest_balance_zero_before",
+    "sender_prev_txn_count",
+    "sender_prev_total_amount",
+    "sender_prev_mean_amount",
+    "sender_prev_max_amount",
+    "dest_prev_txn_count",
+    "dest_prev_total_amount",
+    "dest_prev_mean_amount",
+    "dest_prev_max_amount",
+    "amount_vs_sender_hist_mean",
+    "amount_vs_dest_hist_mean",
+    "sender_hours_since_prev_txn",
+    "dest_hours_since_prev_txn",
+    "dest_txn_count_last_1h",
+    "dest_txn_count_last_24h",
+    "dest_txn_count_last_168h",
+    "dest_amount_sum_last_24h",
+    "dest_amount_sum_last_168h",
+    "type_CASH_IN",
+    "type_CASH_OUT",
+    "type_DEBIT",
+    "type_PAYMENT",
+    "type_TRANSFER"
+  ],
+  "dataset_path": "data\\processed\\v2_retraining_dataset.parquet",
+  "rows_sampled": 1000,
+  "random_seed": 42,
+  "selected_transaction": {
+    "row_index": 0,
+    "transaction_id": 0,
+    "ground_truth_isFraud": 0
+  },
+  "classification_threshold": 0.53,
+  "prediction": {
+    "row_index": 0,
+    "transaction_id": 0,
+    "ground_truth_isFraud": 0,
+    "predicted_fraud_probability": 0.4292810261249542,
+    "predicted_class_at_existing_threshold": 0
+  },
+  "explanation_output_scale": "raw margin (log-odds)",
+  "generated_output_paths": [
+    "D:\\fraud-detection-system\\fraud-detection-system\\reports\\xai_v2\\global_shap_importance.csv",
+    "D:\\fraud-detection-system\\fraud-detection-system\\reports\\xai_v2\\global_shap_importance.png",
+    "D:\\fraud-detection-system\\fraud-detection-system\\reports\\xai_v2\\global_shap_beeswarm.png",
+    "D:\\fraud-detection-system\\fraud-detection-system\\reports\\xai_v2\\local_shap_explanation.csv",
+    "D:\\fraud-detection-system\\fraud-detection-system\\reports\\xai_v2\\local_shap_waterfall.png",
+    "D:\\fraud-detection-system\\fraud-detection-system\\reports\\xai_v2\\xai_run_summary.json"
+  ],
+  "limitations": [
+    "SHAP contributions describe model output relative to a baseline; they do not prove causation."
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "run_id": "20261030T061641Z_b7ac7b9ec4ec4536ac46697435aa39f2",
+  "recommendation": "CANDIDATE_RECOMMENDED_FOR_REVIEW",
+  "scope": "controlled simulation; human review only",
+  "criteria": {
+    "evaluation_completed": true,
+    "required_metrics_finite_and_valid": true,
+    "candidate_pr_auc_better": true,
+    "candidate_f1_better": true,
+    "candidate_recall_not_worse": true,
+    "candidate_false_negatives_not_increased": true
+  },
+  "reasons": [
+    "Candidate passed the predefined gates on identical held-out synthetic observations.",
+    "This is for human review only, not production approval or deployment."
+  ],
+  "metrics": {
+    "V2": {
+      "precision": 0.5495049504950495,
+      "recall": 0.033278369060110925,
+      "f1": 0.06275618374558303,
+      "pr_auc": 0.3632622804244034,
+      "roc_auc": 0.5095218717781675,
+      "accuracy": 0.66845,
+      "tp": 222,
+      "tn": 13147,
+      "fp": 182,
+      "fn": 6449,
+      "rows": 20000,
+      "fraud_count": 6671,
+      "fraud_rate": 0.33355,
+      "threshold": 0.53
+    },
+    "candidate": {
+      "precision": 0.998951624981279,
+      "recall": 0.9998500974366662,
+      "f1": 0.9994006592747977,
+      "pr_auc": 0.9999872335774793,
+      "roc_auc": 0.999993713291852,
+      "accuracy": 0.9996,
+      "tp": 6670,
+      "tn": 13322,
+      "fp": 7,
+      "fn": 1,
+      "rows": 20000,
+      "fraud_count": 6671,
+      "fraud_rate": 0.33355,
+      "threshold": 0.32
+    }
+  },
+  "test_feature_fingerprint": "9dd555f7b241302fbaaee10fd04900a33532dec8ba634e0ca58fdb4fa47698f6",
+  "active_model": "V2",
+  "automatic_promotion": false,
+  "real_verified_labels_used": false,
+  "execution_type": "SIMULATION_ONLY"
+}

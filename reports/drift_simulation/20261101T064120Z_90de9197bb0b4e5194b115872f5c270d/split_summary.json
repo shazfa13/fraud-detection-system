@@ -1,0 +1,29 @@
+{
+  "split_method": "chronological V2 step windows with disjoint source IDs",
+  "train": {
+    "rows": 30000,
+    "step": [
+      1,
+      422
+    ],
+    "simulated_positive": 10096
+  },
+  "validation": {
+    "rows": 12000,
+    "step": [
+      423,
+      565
+    ],
+    "simulated_positive": 3880
+  },
+  "test": {
+    "rows": 20000,
+    "step": [
+      566,
+      743
+    ],
+    "labels_created": false
+  },
+  "source_ids_disjoint": true,
+  "target_in_features": false
+}

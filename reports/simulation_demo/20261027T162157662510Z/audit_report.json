@@ -1,0 +1,170 @@
+{
+  "report_version": 1,
+  "status": "simulation_only_candidate_trained_and_evaluated",
+  "simulation_only": true,
+  "generated_at_utc": "2026-10-27T16:25:37.446578+00:00",
+  "training_started_at_utc": "2026-10-27T16:21:58.358721+00:00",
+  "training_completion_status": "completed",
+  "data_source": {
+    "name": "PaySim synthetic financial transaction data",
+    "label_source": "Existing isFraud labels from the frozen PaySim dataset; simulated labels, not real-world verified outcomes.",
+    "dataset_path": "D:\\fraud-detection-system\\fraud-detection-system\\data\\processed\\v2_retraining_dataset.parquet",
+    "dataset_sha256": "e50ab9b49f409c88cd97b141b2acef733ee2480fd52f365a06136e38953a8f14",
+    "rows": 5382204,
+    "target": "isFraud",
+    "feature_count": 34,
+    "feature_names": [
+      "hour_of_day",
+      "amount",
+      "log_amount",
+      "is_large_amount",
+      "amount_to_sender_balance_ratio",
+      "amount_ge_sender_balance",
+      "sender_remaining_if_debited",
+      "amount_to_dest_balance_ratio",
+      "sender_balance_before",
+      "sender_balance_zero_before",
+      "dest_balance_before",
+      "dest_balance_zero_before",
+      "sender_prev_txn_count",
+      "sender_prev_total_amount",
+      "sender_prev_mean_amount",
+      "sender_prev_max_amount",
+      "dest_prev_txn_count",
+      "dest_prev_total_amount",
+      "dest_prev_mean_amount",
+      "dest_prev_max_amount",
+      "amount_vs_sender_hist_mean",
+      "amount_vs_dest_hist_mean",
+      "sender_hours_since_prev_txn",
+      "dest_hours_since_prev_txn",
+      "dest_txn_count_last_1h",
+      "dest_txn_count_last_24h",
+      "dest_txn_count_last_168h",
+      "dest_amount_sum_last_24h",
+      "dest_amount_sum_last_168h",
+      "type_CASH_IN",
+      "type_CASH_OUT",
+      "type_DEBIT",
+      "type_PAYMENT",
+      "type_TRANSFER"
+    ]
+  },
+  "historical_reuse_warning": "These PaySim records were already used in the project's V1/V2 training, validation, or evaluation experiments. The test partition was held out from this demonstration candidate, but was used in earlier project experiments; this is not a fresh independent evaluation or real-world performance evidence.",
+  "split": {
+    "partitions": {
+      "train": {
+        "start_step": 1,
+        "end_step": 422,
+        "rows": 5015193,
+        "fraud_count": 4201,
+        "legitimate_count": 5010992,
+        "fraud_rate": 0.0008376547024212229
+      },
+      "validation": {
+        "start_step": 423,
+        "end_step": 565,
+        "rows": 185387,
+        "fraud_count": 1492,
+        "legitimate_count": 183895,
+        "fraud_rate": 0.008048029257714943
+      },
+      "test": {
+        "start_step": 566,
+        "end_step": 743,
+        "rows": 181624,
+        "fraud_count": 1956,
+        "legitimate_count": 179668,
+        "fraud_rate": 0.010769501827952253
+      }
+    },
+    "event_id_overlap_counts": {
+      "train_validation": 0,
+      "train_test": 0,
+      "validation_test": 0
+    },
+    "input_rows": 5382204,
+    "assigned_rows": 5382204,
+    "excluded_from_candidate_partitions": 0,
+    "upstream_phase10_validation_gap": {
+      "start_step": 324,
+      "end_step": 378,
+      "rows": 980416,
+      "reason": "Phase 10 excluded the previous V1 validation window when assembling its V2 training dataset.",
+      "note": "This V1 validation window was excluded upstream when the Phase 10 V2 dataset was built; it is not part of the demonstration input."
+    }
+  },
+  "candidate": {
+    "model_type": "XGBClassifier binary:logistic",
+    "artifact_path": "D:\\fraud-detection-system\\fraud-detection-system\\reports\\simulation_demo\\20261027T162157662510Z\\candidate_model.json",
+    "artifact_sha256": "0e2ea322d0f16d918cd42e27bbd98af485e9b03b8ef0142b5067e43cbf4ab89e",
+    "configuration": {
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.05,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 5,
+      "reg_lambda": 1.0,
+      "gamma": 0.0,
+      "scale_pos_weight": 1192.8093311116402,
+      "objective": "binary:logistic",
+      "eval_metric": "aucpr",
+      "tree_method": "hist",
+      "random_state": 42,
+      "n_jobs": -1,
+      "early_stopping_rounds": 30
+    },
+    "random_seed": 42,
+    "training_seconds": 206.29733269999997
+  },
+  "threshold_selection": {
+    "method": "maximum F1 on the validation split only; tie-break by precision, then lower threshold",
+    "selected_threshold": 0.53,
+    "validation_metrics_at_selected_threshold": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "test_used_for_threshold_selection": false
+  },
+  "test_evaluation": {
+    "evaluation_count": 1,
+    "test_used_for_training": false,
+    "test_used_for_threshold_selection": false,
+    "metrics": {
+      "precision": 0.998467824310521,
+      "recall": 0.9994887525562373,
+      "f1": 0.9989780275932549,
+      "pr_auc": 0.9994901150829729
+    },
+    "confusion_matrix_labels": [
+      "legitimate",
+      "fraud"
+    ],
+    "confusion_matrix": [
+      [
+        179665,
+        3
+      ],
+      [
+        1,
+        1955
+      ]
+    ],
+    "counts": {
+      "rows": 181624,
+      "fraud_count": 1956,
+      "tn": 179665,
+      "fp": 3,
+      "fn": 1,
+      "tp": 1955
+    }
+  },
+  "deployment": {
+    "active_model_modified": false,
+    "promotion_attempted": false,
+    "real_retraining_worker_used": false
+  },
+  "audit_report_path": "D:\\fraud-detection-system\\fraud-detection-system\\reports\\simulation_demo\\20261027T162157662510Z\\audit_report.json"
+}

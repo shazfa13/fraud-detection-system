@@ -1,5 +1,7 @@
 # Stage 6: Controlled retraining demonstration
 
+> **Scope note (2026-11-01):** This Stage 6 program samples existing synthetic PaySim `isFraud` labels. It is separate from the newer controlled drift experiment, which generates outcomes using a constructed XOR rule and is described in [DRIFT_SIMULATION.md](DRIFT_SIMULATION.md). Neither workflow uses genuine verified labels or qualifies for real promotion.
+
 Stage 6 demonstrates candidate training mechanics without changing Stage 4's
 genuine-label gate. It reads the existing
 data/processed/v2_retraining_dataset.parquet, which contains historical

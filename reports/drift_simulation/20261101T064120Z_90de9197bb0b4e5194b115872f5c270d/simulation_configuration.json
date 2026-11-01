@@ -1,0 +1,78 @@
+{
+  "run_id": "20261101T064120Z_90de9197bb0b4e5194b115872f5c270d",
+  "seed": 20261030,
+  "data_sha256": "e50ab9b49f409c88cd97b141b2acef733ee2480fd52f365a06136e38953a8f14",
+  "source_target_loaded": false,
+  "temporal_bounds": {
+    "train_end": 422,
+    "validation_end": 565,
+    "test_end": 743
+  },
+  "source_window_rows": {
+    "train": 5015193,
+    "validation": 185387,
+    "test": 181624
+  },
+  "sampled_pool_rows": {
+    "train": 100000,
+    "validation": 40000,
+    "test": 60000
+  },
+  "simulation_rows": {
+    "train": 30000,
+    "validation": 12000,
+    "test": 20000
+  },
+  "sampling": "unique weighted sampling without replacement",
+  "weights": {
+    "base": 1.0,
+    "high_amount": 5.0,
+    "transfer": 6.0,
+    "cash_out": 2.0
+  },
+  "concept_rule": "simulated isFraud = (amount >= training-source 80th percentile) XOR type_TRANSFER",
+  "amount_cutoff": 245047.94400000008,
+  "features": [
+    "hour_of_day",
+    "amount",
+    "log_amount",
+    "is_large_amount",
+    "amount_to_sender_balance_ratio",
+    "amount_ge_sender_balance",
+    "sender_remaining_if_debited",
+    "amount_to_dest_balance_ratio",
+    "sender_balance_before",
+    "sender_balance_zero_before",
+    "dest_balance_before",
+    "dest_balance_zero_before",
+    "sender_prev_txn_count",
+    "sender_prev_total_amount",
+    "sender_prev_mean_amount",
+    "sender_prev_max_amount",
+    "dest_prev_txn_count",
+    "dest_prev_total_amount",
+    "dest_prev_mean_amount",
+    "dest_prev_max_amount",
+    "amount_vs_sender_hist_mean",
+    "amount_vs_dest_hist_mean",
+    "sender_hours_since_prev_txn",
+    "dest_hours_since_prev_txn",
+    "dest_txn_count_last_1h",
+    "dest_txn_count_last_24h",
+    "dest_txn_count_last_168h",
+    "dest_amount_sum_last_24h",
+    "dest_amount_sum_last_168h",
+    "type_CASH_IN",
+    "type_CASH_OUT",
+    "type_DEBIT",
+    "type_PAYMENT",
+    "type_TRANSFER"
+  ],
+  "audit_columns": [
+    "event_id",
+    "step"
+  ],
+  "target": "isFraud",
+  "labels": "synthetic, not verified ground truth",
+  "test_labels_created_before_training": false
+}

@@ -1,6 +1,6 @@
 # Project results and limitations
 
-This report separates V2's chronological test-set metrics from Stage 6's smaller demonstration evaluation. All underlying labels come from synthetic PaySim data; neither result establishes real-world bank performance.
+This report separates V2 chronological test-set metrics from the distinct Stage 6 and controlled drift simulation evaluations. All underlying labels come from synthetic PaySim data; neither result establishes real-world bank performance.
 
 ## Dataset and model contract
 
@@ -60,3 +60,11 @@ These checks support code-path and safety-contract behavior. They do not prove l
 - [Phase 9 simulated label collection](../reports/recent_label_collection_report.json)
 - [Stage 3 drift report](../reports/drift_report.json)
 - [Stage 7 machine-readable validation](../reports/stage7_end_to_end_validation_20261025T150813Z.json)
+
+## Controlled drift simulation (separate demonstration)
+
+The newer notebook/callable experiment in `notebooks/drift_detection_simulation.ipynb` and `src/retraining/drift_simulation_workflow.py` is distinct from the Stage 6 PaySim-label sample described above. It intentionally ignores source `isFraud` labels, generates demonstration outcomes from `(amount >= training-source 80th percentile) XOR type_TRANSFER`, trains a separate candidate, detects distribution changes, then compares V2 and candidate on identical test features labeled by that same rule.
+
+The latest saved run, `20261101T064120Z_90de9197bb0b4e5194b115872f5c270d`, flagged 31/34 features as drifted (91.18%). Its 20,000-row synthetic test cohort had 6,671 generated positives. V2 at 0.53 scored precision 0.549505, recall 0.033278, F1 0.062756, PR-AUC 0.363262, ROC-AUC 0.509522; the simulation candidate at its validation-selected 0.32 scored precision 0.998952, recall 0.999850, F1 0.999401, PR-AUC 0.999987, ROC-AUC 0.999994. The generated target rule is directly reflected in the candidate's training/evaluation labels; this apparent advantage is only an internal demonstration result, not evidence of fraud-detection superiority. The report recommendation is scoped to simulated human review only.
+
+The run's final audit records V2 active and its model/metadata/threshold hashes unchanged, candidate stored separately, real orchestrator run inventory unchanged, no genuine verified labels used, and no automatic promotion. Its reports and figures are under `reports/drift_simulation/<run-id>/`; separate candidate files are under `models/drift_simulation/<run-id>/`. See [DRIFT_SIMULATION.md](DRIFT_SIMULATION.md) for procedure and artifact details.
